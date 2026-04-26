@@ -1,0 +1,149 @@
+import { falClient } from '@/lib/fal';
+import type { EditImageInput, EditImageResult, EditSubscribeOptions, EditSubscribeResult, GenerationTimingBreakdown } from '@/components/salon-experience-types';
+
+const ENDPOINT = 'openai/gpt-image-2/edit';
+
+type FalQueueStatus = {
+  status: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED';
+  request_id: string;
+  queue_position?: number;
+  metrics?: {
+    inference_time: number | null;
+  };
+};
+
+const summarizeInput = (input: EditImageInput) => ({
+  imageCount: input.image_urls.length,
+  imageKinds: input.image_urls.map((url) => (url.startsWith('data:') ? 'data-url' : 'remote-url')),
+  promptLength: input.prompt.length,
+  quality: input.quality,
+  imageSize: input.image_size,
+  outputFormat: input.output_format,
+  numImages: input.num_images,
+});
+
+const summarizeResult = (result: EditImageResult) => ({
+  imageCount: result.data.images.length,
+  hasImages: result.data.images.length > 0,
+});
+
+const buildTimingBreakdown = ({
+  startedAt,
+  enqueuedAt,
+  inProgressAt,
+  completedAt,
+  requestId,
+  providerInferenceMs,
+}: {
+  startedAt: number;
+  enqueuedAt: number | null;
+  inProgressAt: number | null;
+  completedAt: number;
+  requestId: string | null;
+  providerInferenceMs: number | null;
+}): GenerationTimingBreakdown => ({
+  requestId,
+  submitMs: enqueuedAt ? Math.max(0, enqueuedAt - startedAt) : null,
+  queueMs: enqueuedAt && inProgressAt ? Math.max(0, inProgressAt - enqueuedAt) : null,
+  generationMs: providerInferenceMs ?? (inProgressAt ? Math.max(0, completedAt - inProgressAt) : null),
+  totalMs: Math.max(0, completedAt - startedAt),
+  providerInferenceMs,
+});
+
+const subscribeEdit = async (kind: 'analysis' | 'try-on', input: EditImageInput, options: EditSubscribeOptions = {}): Promise<EditSubscribeResult> => {
+  const subscribe = falClient.subscribe as unknown as (
+    endpointId: string,
+    options: {
+      input: EditImageInput;
+      logs?: boolean;
+      onEnqueue?: (requestId: string) => void;
+      onQueueUpdate?: (status: FalQueueStatus) => void;
+    },
+  ) => Promise<EditImageResult>;
+
+  const startedAt = Date.now();
+  let requestId: string | null = null;
+  let enqueuedAt: number | null = null;
+  let inProgressAt: number | null = null;
+  let completedAt: number | null = null;
+  let queuePosition: number | null = null;
+  let providerInferenceMs: number | null = null;
+
+  options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+
+  console.log(`[fal][${kind}] openai/gpt-image-2/edit payload`, {
+    endpoint: ENDPOINT,
+    input: summarizeInput(input),
+  });
+
+  try {
+    const result = await subscribe(ENDPOINT, {
+      input,
+      logs: false,
+      onEnqueue: (nextRequestId) => {
+        requestId = nextRequestId;
+        enqueuedAt = Date.now();
+        options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
+      },
+      onQueueUpdate: (status) => {
+        requestId = status.request_id;
+
+        if (status.status === 'IN_QUEUE') {
+          queuePosition = typeof status.queue_position === 'number' ? status.queue_position : null;
+          options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
+          return;
+        }
+
+        if (status.status === 'IN_PROGRESS') {
+          if (!inProgressAt) {
+            inProgressAt = Date.now();
+          }
+          options.onStatusChange?.({ phase: 'generating', requestId, queuePosition });
+          return;
+        }
+
+        completedAt = Date.now();
+        if (!inProgressAt) {
+          inProgressAt = completedAt;
+        }
+        providerInferenceMs = status.metrics?.inference_time == null ? null : Math.max(0, Math.round(status.metrics.inference_time * 1000));
+        options.onStatusChange?.({ phase: 'completed', requestId, queuePosition });
+      },
+    });
+
+    const timing = buildTimingBreakdown({
+      startedAt,
+      enqueuedAt,
+      inProgressAt,
+      completedAt: completedAt ?? Date.now(),
+      requestId,
+      providerInferenceMs,
+    });
+
+    console.log(`[fal][${kind}] openai/gpt-image-2/edit response body`, {
+      result: summarizeResult(result),
+      timing,
+    });
+
+    return { result, timing };
+  } catch (error) {
+    console.error(`[fal][${kind}] openai/gpt-image-2/edit error`, {
+      endpoint: ENDPOINT,
+      input: summarizeInput(input),
+      timing: buildTimingBreakdown({
+        startedAt,
+        enqueuedAt,
+        inProgressAt,
+        completedAt: Date.now(),
+        requestId,
+        providerInferenceMs,
+      }),
+      error,
+    });
+    throw error;
+  }
+};
+
+export const subscribeAnalysisEdit = async (input: EditImageInput, options?: EditSubscribeOptions) => subscribeEdit('analysis', input, options);
+
+export const subscribeTryOnEdit = async (input: EditImageInput, options?: EditSubscribeOptions) => subscribeEdit('try-on', input, options);

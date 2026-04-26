@@ -1,0 +1,186 @@
+import type { HairColorOption, HairstyleOption } from '@/components/salon-experience-types';
+
+export const hairstyleOptions: HairstyleOption[] = [
+  // ── Male ──────────────────────────────────────────────────────────────────
+  {
+    id: 'male-low-fade-crop',
+    label: 'รองทรงต่ำ (Low Fade Crop)',
+    category: 'male',
+    description: 'ทรงผู้ชายยอดฮิตในไทย ด้านข้างไล่เฟดต่ำ ด้านบนสั้นมีเท็กซ์เจอร์',
+    prompt: 'Apply a low fade crop haircut with clean low faded sides and a short textured top. Keep the top short, compact, and piecey with visible matte texture, styled mostly forward. Add a very short soft fringe that sits lightly near the upper forehead. The overall shape should look neat, masculine, and easy to maintain, with a tight taper at the back and no dramatic volume.',
+  },
+  {
+    id: 'male-two-block-korean',
+    label: 'ทูบล็อกเกาหลี (Two Block)',
+    category: 'male',
+    description: 'ทรงยอดนิยมในไทย ข้างสั้น ด้านบนมีวอลุ่ม ดูเกาหลีทันสมัย',
+    prompt: 'Apply a Korean two-block haircut with shorter sides and back but still some visible side bulk, not shaved to the skin. Keep the top clearly longer and fuller than the sides, with soft natural volume and a slightly tousled Korean salon finish. The shape should show a visible disconnection between the fuller top section and the neater side section. Make it look youthful, modern, and polished.',
+  },
+  {
+    id: 'male-comma-hair',
+    label: 'คอมม่าแฮร์ (Comma Hair)',
+    category: 'male',
+    description: 'หน้าม้าปัดโค้งสไตล์ไอดอล ทรงนิยมในร้านไทย',
+    prompt: 'Apply a comma hair haircut with a clearly visible curved front fringe as the signature feature. The fringe should sweep across the forehead and curl inward on one side like a comma shape, sitting just above one eyebrow. Keep the top softly voluminous and polished, with neat short-to-medium sides and a healthy semi-gloss Korean idol finish.',
+  },
+  {
+    id: 'male-french-crop',
+    label: 'เฟรนช์ครอป (French Crop)',
+    category: 'male',
+    description: 'ทรงสั้นดูแลง่าย ได้ลุคสะอาดคมชัด เหมาะอากาศเมืองไทย',
+    prompt: 'Apply a French crop haircut with a short compact top and a straight blunt fringe across the upper forehead as the key feature. Keep the fringe flat, sharp, and clearly horizontal, not parted or swept. The sides and back should be tighter and cleaner than the top, with a low fade or taper. The overall result should feel crisp, tidy, and structured.',
+  },
+  {
+    id: 'male-undercut-slick-back',
+    label: 'อันเดอร์คัตเสย (Slick Back)',
+    category: 'male',
+    description: 'ทรงคลาสสิกยอดนิยมในไทย เปิดหน้า ดูมืออาชีพ',
+    prompt: 'Apply a slick-back undercut haircut with very short clean sides and back and a clearly longer top. Slick the top straight back away from the forehead with a smooth glossy finish, as if styled with pomade. Keep the forehead fully open and the contrast between the tight sides and sleek top strong and obvious. Do not add a shaved part line unless it appears naturally from the styling.',
+  },
+  {
+    id: 'male-high-fade-buzz',
+    label: 'รองทรงสูง (High Fade Buzz)',
+    category: 'male',
+    description: 'เฟดสูงดูหล่อคม เป็นทรงยอดฮิตในกลุ่มนักศึกษาไทย',
+    prompt: 'Apply a high fade buzz cut with a very short evenly buzzed top and a high tight fade on both sides. The fade should start high on the head and create a sharp, clean masculine outline. Keep the silhouette compact, crisp, and square, with no loose texture or long fringe.',
+  },
+  {
+    id: 'male-textured-quiff',
+    label: 'ควิฟเท็กซ์เจอร์ (Textured Quiff)',
+    category: 'male',
+    description: 'ด้านบนพองนิดหน่อย มีเท็กซ์เจอร์ ดูเท่ทันสมัย',
+    prompt: 'Apply a textured quiff haircut with the front lifted above the forehead to create clear volume at the hairline. Keep the top medium length with matte piecey texture and visible separation, while the sides stay shorter and cleaner with a soft fade. The silhouette should be tallest at the front and flow naturally backward without looking stiff.',
+  },
+  {
+    id: 'male-bowl-cut-modern',
+    label: 'ทรงบาวล์โมเดิร์น (Modern Bowl)',
+    category: 'male',
+    description: 'ทรงบาวล์เกาหลีที่กำลังฮิตในไทย ขอบตัดเนี้ยบ ดูมินิมอล',
+    prompt: 'Apply a modern Korean bowl cut with a smooth rounded dome shape on top and a precise blunt perimeter line wrapping around the head. Keep the top neat, flat, and polished, with the bowl outline clearly visible. The lower sides and back should be much shorter to create a strong contrast under the rounded top section. The result should feel minimal, clean, and fashion-forward.',
+  },
+  {
+    id: 'male-curtain-hair',
+    label: 'ม่านผมชาย (Curtain Hair)',
+    category: 'male',
+    description: 'ผมยาวกลางแยกกลาง สไตล์เกาหลีนิยมในไทย',
+    prompt: 'Apply a men curtain hairstyle with a clean center part and longer front sections falling on both sides of the face like curtains. Let the front pieces frame the cheeks naturally, with medium length hair and soft movement. Keep the sides softer and fuller than a fade. The finish should be relaxed, natural, and Korean-inspired, with light healthy shine and no heavy product.',
+  },
+  {
+    id: 'male-shaggy-wolf',
+    label: 'แชกกี้วูล์ฟ (Shaggy Wolf)',
+    category: 'male',
+    description: 'ทรงวูล์ฟสำหรับผู้ชาย เลเยอร์เยอะ ดูร็อคแต่ก็สบายตา',
+    prompt: 'Apply a men shaggy wolf cut with heavy visible layers, strong texture, and a fuller crown. Keep the top rounder and more voluminous, then let the hair break into wispy feathered ends around the sides and back. Add loose face-framing pieces and a slightly rebellious rock-inspired silhouette. The finish should look airy, natural, and textured rather than sleek.',
+  },
+
+  // ── Female ────────────────────────────────────────────────────────────────
+  {
+    id: 'female-hush-cut',
+    label: 'ฮัชคัต (Hush Cut)',
+    category: 'female',
+    description: 'เลเยอร์เกาหลีทรงฮิตในไทย พลิ้วเบาและดูแพง',
+    prompt: 'Apply a hush cut hairstyle with soft airy Korean layers and a lightweight elegant finish. Keep the outer length around the chin to collarbone area, while inner layers feel shorter and lighter so the hair looks soft and floating when it moves. Add gentle face-framing pieces and feathered ends. The result should feel expensive, delicate, and naturally airy rather than heavy.',
+  },
+  {
+    id: 'female-wolf-cut-soft',
+    label: 'วูล์ฟคัตซอฟต์ (Soft Wolf Cut)',
+    category: 'female',
+    description: 'ทรงฮิตมากในไทยช่วงหลัง เลเยอร์ชัดแต่ยังนุ่มหวาน',
+    prompt: 'Apply a soft wolf cut hairstyle with visible layered volume at the crown and softer cascading layers through the length. Keep the top fuller and rounder, then narrow gradually toward wispy feathered ends. Add face-framing layers around the cheeks and jaw. The finish should stay soft, romantic, and feminine, with light natural movement instead of a harsh edgy look.',
+  },
+  {
+    id: 'female-lob-c-curl',
+    label: 'ล็อบปลายงุ้ม (Lob C-Curl)',
+    category: 'female',
+    description: 'ทรงประบ่ายอดนิยมในไทย ปลายงุ้มช่วยรับกรอบหน้า',
+    prompt: 'Apply a lob hairstyle that falls around the collarbone, with smooth polished hair and clear inward C-curl ends. The ends should bend neatly toward the face all around, creating a soft oval frame. Keep the surface sleek, glossy, and controlled, with minimal layering and a premium salon finish.',
+  },
+  {
+    id: 'female-long-layer-wave',
+    label: 'เลเยอร์ยาวลอนเบา (Long Layer Wave)',
+    category: 'female',
+    description: 'ทรงยอดนิยมในไทย ลุคหวานหรู ดูหนาผมสุขภาพดี',
+    prompt: 'Apply a long layered wavy hairstyle with soft loose waves from the mid-length to the ends. Keep the length long and full, with face-framing layers that add movement and prevent the hair from looking flat or heavy. The overall look should be sweet, elegant, and healthy, with glossy volume and naturally flowing waves.',
+  },
+  {
+    id: 'female-curtain-bangs',
+    label: 'หน้าม้ากลาง (Curtain Bangs)',
+    category: 'female',
+    description: 'ทรงฮิตในไทย ช่วยบาลานซ์รูปหน้าและเพิ่มความละมุน',
+    prompt: 'Apply a curtain bangs hairstyle with a clear center part and soft wispy bangs opening away from the forehead on both sides. The bangs should frame the eyes and cheeks gently and blend into the rest of the hair. Keep the overall hair medium to long with soft flattering layers. The result should look balanced, feminine, and naturally polished.',
+  },
+  {
+    id: 'female-bob-classic',
+    label: 'บ็อบคลาสสิก (Classic Bob)',
+    category: 'female',
+    description: 'บ็อบตัดตรงเป็นทรงยืนพื้นยอดนิยมตลอดกาลในไทย',
+    prompt: 'Apply a classic blunt bob hairstyle cut at chin level with a perfectly straight heavy perimeter line. Keep the shape symmetrical, sleek, and geometric, with smooth glossy hair and no visible layers or waves. The bob should frame the face evenly on both sides and look timeless, sharp, and tailored.',
+  },
+  {
+    id: 'female-pixie-soft',
+    label: 'พิกซี่นุ่ม (Soft Pixie)',
+    category: 'female',
+    description: 'ทรงสั้นดูเก๋ มีเท็กซ์เจอร์นุ่ม กำลังฮิตในร้านไทย',
+    prompt: 'Apply a soft feminine pixie cut with a short close silhouette and slightly longer soft texture on top. Keep the sides and nape neat and tapered, while the top and fringe stay airy and touchable. Add a delicate soft fringe around the forehead. The result should look chic, light, and feminine, not severe or spiky.',
+  },
+  {
+    id: 'female-fluffy-short-bob',
+    label: 'บ็อบฟลัฟฟี่ (Fluffy Short Bob)',
+    category: 'female',
+    description: 'บ็อบสั้นพองฟู สไตล์เกาหลีนิยมในไทย ดูสดใส',
+    prompt: 'Apply a fluffy short bob hairstyle with a short rounded silhouette between the ear and jawline. The key feature is soft airy volume that makes the bob look full, bouncy, and youthful, especially around the cheeks and sides. Keep the outline rounded rather than sharp, with light movement and a fresh Korean salon finish. Avoid a strong flipped-out retro shape.',
+  },
+  {
+    id: 'female-see-through-bangs',
+    label: 'หน้าม้าซีทรู (See-Through Bangs)',
+    category: 'female',
+    description: 'หน้าม้าบางเบา โปร่งแสง กำลังฮิตในไทย',
+    prompt: 'Apply a see-through bangs hairstyle with very thin wispy bangs that lightly cover the forehead while still letting the forehead remain visible through the strands. Keep the fringe soft, airy, and delicate, with slight separation at the center rather than a heavy solid bang. The rest of the hair should stay smooth and feminine. The overall look should feel light, understated, and Korean-inspired.',
+  },
+  {
+    id: 'female-bun-messy',
+    label: 'มวยสูงเก๋ (Messy Top Knot)',
+    category: 'female',
+    description: 'มวยสูงดูเป็นธรรมชาติ สไตล์ฮิตในไทย เหมาะทุกโอกาส',
+    prompt: 'Apply a messy high bun hairstyle with all hair gathered at the top of the head into a loose relaxed top knot. The bun should look intentionally effortless, not tight or formal, with soft flyaway pieces and wispy face-framing strands around the temples and cheeks. Keep the overall impression casual, chic, and naturally pretty.',
+  },
+];
+
+export const hairColorOptions: HairColorOption[] = [
+  {
+    id: 'natural-black',
+    label: 'Natural Black',
+    swatch: '#1a1414',
+    prompt: 'Recolor the hair to natural black with soft realistic shine.',
+  },
+  {
+    id: 'dark-brown',
+    label: 'Chocolate Brown',
+    swatch: '#4a3528',
+    prompt: 'Recolor the hair to dark chocolate brown with natural depth.',
+  },
+  {
+    id: 'ash-brown',
+    label: 'Ash Brown',
+    swatch: '#6a5a4f',
+    prompt: 'Recolor the hair to ash brown with cool muted tone.',
+  },
+  {
+    id: 'milk-tea-brown',
+    label: 'Milk Tea Beige',
+    swatch: '#9a7b5f',
+    prompt: 'Recolor the hair to milk tea brown with soft warm-beige reflect.',
+  },
+  {
+    id: 'caramel-brown',
+    label: 'Caramel Brown',
+    swatch: '#a86f3b',
+    prompt: 'Recolor the hair to caramel brown with warm glossy highlights.',
+  },
+  {
+    id: 'smoky-gray',
+    label: 'Smoky Ash Gray',
+    swatch: '#7a7c82',
+    prompt: 'Recolor the hair to smoky gray with balanced cool undertone.',
+  },
+];
