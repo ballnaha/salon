@@ -12,6 +12,7 @@ import { subscribeAnalysisEdit, subscribeTryOnEdit } from '@/components/salon-ex
 import { analysisPrompt, buildHairColorPrompt, buildTryOnPrompt } from '@/components/salon-experience-prompts';
 import { hairColorOptions, hairstyleOptions } from '@/components/salon-experience-styles';
 import type { FlowMode, FlowStep, GenerationTimingBreakdown, HairColorOption, HairstyleOption, TryOnResult } from '@/components/salon-experience-types';
+import { FalCreditBalance } from '@/components/fal-credit-balance';
 
 const pulse = keyframes`
   0% { transform: scale(1); opacity: 0.6; }
@@ -31,8 +32,14 @@ const glassBg = 'rgba(255, 255, 255, 0.03)';
 const glassBorder = 'rgba(255, 255, 255, 0.08)';
 
 const defaultHairColorId = hairColorOptions[0]?.id ?? '';
-const MAX_INPUT_IMAGE_DIMENSION = 1280;
-const INPUT_IMAGE_QUALITY = 0.86;
+/**
+ * ขนาดด้านที่ยาวที่สุดของรูปที่จะส่งไป AI (px)
+ * - 1280 → รูป 9:16 จะเหลือ 720×1280px (เล็กเกินไปสำหรับวิเคราะห์ทรงผม)
+ * - 1536 → รูป 9:16 จะเหลือ 864×1536px (แนะนำ — รายละเอียดดีพอและไม่หน่วงเกิน)
+ * - 2048 → รูป 9:16 จะเหลือ 1152×2048px (คมสุด แต่ upload ช้าขึ้น ~2x)
+ */
+const MAX_INPUT_IMAGE_DIMENSION = 1536;
+const INPUT_IMAGE_QUALITY = 0.88;
 const TRY_ON_CONCURRENCY = 2;
 
 /** ตั้งค่าจำนวนทรงผมสูงสุดที่เลือกได้ — เปลี่ยนตัวเลขนี้เพื่อปรับค่า */
@@ -189,7 +196,7 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
               SELECT YOUR EXPERIENCE
             </Typography>
             <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: 900, lineHeight: 1.1, textAlign: 'center' }}>
-              เริ่มต้นด้วยอะไร?
+              เริ่มต้นกันเลย
             </Typography>
           </Stack>
 
@@ -211,20 +218,20 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
                 gap: 1,
                 py: 2,
                 px: 0.5,
-                bgcolor: '#0f172a',
+                background: 'linear-gradient(145deg, #4a1525 0%, #2d0d17 100%)',
                 borderRadius: 3,
-                border: 'none',
+                border: '1px solid rgba(217,147,164,0.15)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 '&:active': { transform: 'scale(0.94)', opacity: 0.85 },
               }}
             >
-              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d993a4' }}>
+              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(217,147,164,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8b0c0' }}>
                 <Magicpen size={18} variant="Bold" color="currentColor" />
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Analysis</Typography>
-                <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.55rem' }}>วิเคราะห์</Typography>
+                <Typography sx={{ color: 'rgba(232,176,192,0.65)', fontSize: '0.65rem' }}>วิเคราะห์</Typography>
               </Stack>
             </Box>
 
@@ -253,7 +260,7 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: '#1a1114', fontWeight: 800, fontSize: '0.72rem' }}>Try-On</Typography>
-                <Typography sx={{ color: 'rgba(26,17,20,0.5)', fontSize: '0.55rem' }}>ลองทรงผม</Typography>
+                <Typography sx={{ color: 'rgba(26,17,20,0.5)', fontSize: '0.65rem' }}>ลองทรงผม</Typography>
               </Stack>
             </Box>
 
@@ -269,22 +276,27 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
                 gap: 1,
                 py: 2,
                 px: 0.5,
-                bgcolor: '#334155',
+                background: 'linear-gradient(145deg, #7c3d28 0%, #4d2418 100%)',
                 borderRadius: 3,
-                border: 'none',
+                border: '1px solid rgba(226,177,138,0.15)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 '&:active': { transform: 'scale(0.94)', opacity: 0.85 },
               }}
             >
-              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f1f5f9' }}>
+              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(226,177,138,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e2b18a' }}>
                 <Brush size={18} variant="Bold" color="currentColor" />
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Color</Typography>
-                <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.55rem' }}>เปลี่ยนสี</Typography>
+                <Typography sx={{ color: 'rgba(226,177,138,0.65)', fontSize: '0.65rem' }}>เปลี่ยนสี</Typography>
               </Stack>
             </Box>
+          </Box>
+
+          {/* Footer Fal Credit for Mobile */}
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <FalCreditBalance />
           </Box>
         </Box>
       </Box>
@@ -322,7 +334,7 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
 
             <Button
               onClick={() => onSelect('analysis')}
-              sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(15,23,42,0.08)' }}
+              sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(74,21,37,0.12)' }}
             >
               <Stack direction="row" sx={{ width: '100%' }}>
                 <Stack spacing={1} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
@@ -330,10 +342,10 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
                   <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
                     วิเคราะห์โครงหน้าและทรงผมที่เหมาะกับคุณที่สุด
                   </Typography>
-                  <Chip label="Smart Analysis" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(217,147,164,0.12)', color: '#9f445e', fontWeight: 900, borderRadius: 1.5 }} />
+                  <Chip label="Smart Analysis" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(74,21,37,0.08)', color: '#9f445e', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
-                <Box sx={{ width: 88, bgcolor: '#111827', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Magicpen size={28} variant="Bold" />
+                <Box sx={{ width: 88, background: 'linear-gradient(160deg, #4a1525 0%, #2d0d17 100%)', color: '#e8b0c0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Magicpen size={28} variant="Bold" color="currentColor" />
                 </Box>
               </Stack>
             </Button>
@@ -351,14 +363,14 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
                   <Chip label="Virtual Try-On" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(15,23,42,0.08)', color: '#0f172a', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, bgcolor: '#d993a4', color: '#1a1114', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Camera size={28} variant="Bold" />
+                  <Camera size={28} variant="Bold" color="currentColor" />
                 </Box>
               </Stack>
             </Button>
 
             <Button
               onClick={() => onSelect('recolor')}
-              sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(15,23,42,0.08)' }}
+              sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(124,61,40,0.12)' }}
             >
               <Stack direction="row" sx={{ width: '100%' }}>
                 <Stack spacing={1} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
@@ -366,14 +378,19 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
                   <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
                     ทดลองเฉดสีผมใหม่ๆ บนทรงผมเดิมของคุณ
                   </Typography>
-                  <Chip label="AI Color" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(194,114,127,0.1)', color: '#c2727f', fontWeight: 900, borderRadius: 1.5 }} />
+                  <Chip label="AI Color" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(124,61,40,0.1)', color: '#7c3d28', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
-                <Box sx={{ width: 88, bgcolor: '#334155', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Brush size={28} variant="Bold" />
+                <Box sx={{ width: 88, background: 'linear-gradient(160deg, #7c3d28 0%, #4d2418 100%)', color: '#e2b18a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Brush size={28} variant="Bold" color="currentColor" />
                 </Box>
               </Stack>
             </Button>
           </Stack>
+          
+          {/* Footer Fal Credit for Desktop */}
+          <Box sx={{ mt: 'auto', pt: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <FalCreditBalance />
+          </Box>
         </Box>
       </Box>
     </AppWrapper>

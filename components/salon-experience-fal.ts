@@ -61,89 +61,121 @@ const subscribeEdit = async (kind: 'analysis' | 'try-on', input: EditImageInput,
     },
   ) => Promise<EditImageResult>;
 
-  const startedAt = Date.now();
-  let requestId: string | null = null;
-  let enqueuedAt: number | null = null;
-  let inProgressAt: number | null = null;
-  let completedAt: number | null = null;
-  let queuePosition: number | null = null;
-  let providerInferenceMs: number | null = null;
+  const MAX_RETRIES = 2;
 
-  options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+  const isRetryableError = (error: unknown): boolean => {
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      return msg.includes('timeout') || msg.includes('gateway') || msg.includes('503') || msg.includes('502');
+    }
+    return false;
+  };
 
-  console.log(`[fal][${kind}] openai/gpt-image-2/edit payload`, {
-    endpoint: ENDPOINT,
-    input: summarizeInput(input),
-  });
+  for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+    const startedAt = Date.now();
+    let requestId: string | null = null;
+    let enqueuedAt: number | null = null;
+    let inProgressAt: number | null = null;
+    let completedAt: number | null = null;
+    let queuePosition: number | null = null;
+    let providerInferenceMs: number | null = null;
 
-  try {
-    const result = await subscribe(ENDPOINT, {
-      input,
-      logs: false,
-      onEnqueue: (nextRequestId) => {
-        requestId = nextRequestId;
-        enqueuedAt = Date.now();
-        options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
-      },
-      onQueueUpdate: (status) => {
-        requestId = status.request_id;
+    if (attempt === 1) {
+      options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+    } else {
+      options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+    }
 
-        if (status.status === 'IN_QUEUE') {
-          queuePosition = typeof status.queue_position === 'number' ? status.queue_position : null;
-          options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
-          return;
-        }
-
-        if (status.status === 'IN_PROGRESS') {
-          if (!inProgressAt) {
-            inProgressAt = Date.now();
-          }
-          options.onStatusChange?.({ phase: 'generating', requestId, queuePosition });
-          return;
-        }
-
-        completedAt = Date.now();
-        if (!inProgressAt) {
-          inProgressAt = completedAt;
-        }
-        providerInferenceMs = status.metrics?.inference_time == null ? null : Math.max(0, Math.round(status.metrics.inference_time * 1000));
-        options.onStatusChange?.({ phase: 'completed', requestId, queuePosition });
-      },
-    });
-
-    const timing = buildTimingBreakdown({
-      startedAt,
-      enqueuedAt,
-      inProgressAt,
-      completedAt: completedAt ?? Date.now(),
-      requestId,
-      providerInferenceMs,
-    });
-
-    console.log(`[fal][${kind}] openai/gpt-image-2/edit response body`, {
-      result: summarizeResult(result),
-      timing,
-    });
-
-    return { result, timing };
-  } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack } : error;
-    console.error(`[fal][${kind}] ${ENDPOINT} error`, {
+    console.log(`[fal][${kind}] openai/gpt-image-2/edit payload (attempt ${attempt}/${MAX_RETRIES + 1})`, {
       endpoint: ENDPOINT,
       input: summarizeInput(input),
-      timing: buildTimingBreakdown({
+    });
+
+    try {
+      const result = await subscribe(ENDPOINT, {
+        input,
+        logs: false,
+        onEnqueue: (nextRequestId) => {
+          requestId = nextRequestId;
+          enqueuedAt = Date.now();
+          options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
+        },
+        onQueueUpdate: (status) => {
+          requestId = status.request_id;
+
+          if (status.status === 'IN_QUEUE') {
+            queuePosition = typeof status.queue_position === 'number' ? status.queue_position : null;
+            options.onStatusChange?.({ phase: 'queued', requestId, queuePosition });
+            return;
+          }
+
+          if (status.status === 'IN_PROGRESS') {
+            if (!inProgressAt) {
+              inProgressAt = Date.now();
+            }
+            options.onStatusChange?.({ phase: 'generating', requestId, queuePosition });
+            return;
+          }
+
+          completedAt = Date.now();
+          if (!inProgressAt) {
+            inProgressAt = completedAt;
+          }
+          providerInferenceMs = status.metrics?.inference_time == null ? null : Math.max(0, Math.round(status.metrics.inference_time * 1000));
+          options.onStatusChange?.({ phase: 'completed', requestId, queuePosition });
+        },
+      });
+
+      const timing = buildTimingBreakdown({
         startedAt,
         enqueuedAt,
         inProgressAt,
-        completedAt: Date.now(),
+        completedAt: completedAt ?? Date.now(),
         requestId,
         providerInferenceMs,
-      }),
-      error: errorDetails,
-    });
-    throw error;
+      });
+
+      console.log(`[fal][${kind}] openai/gpt-image-2/edit response body`, {
+        result: summarizeResult(result),
+        timing,
+      });
+
+      return { result, timing };
+    } catch (error) {
+      const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack } : error;
+      console.error(`[fal][${kind}] ${ENDPOINT} error (attempt ${attempt})`, {
+        endpoint: ENDPOINT,
+        input: summarizeInput(input),
+        timing: buildTimingBreakdown({
+          startedAt,
+          enqueuedAt,
+          inProgressAt,
+          completedAt: Date.now(),
+          requestId,
+          providerInferenceMs,
+        }),
+        error: errorDetails,
+      });
+
+      // ถ้ายัง retry ได้อยู่ และเป็น error ที่ควร retry
+      if (attempt <= MAX_RETRIES && isRetryableError(error)) {
+        const retryDelayMs = 2000 * attempt; // 2s, 4s
+        console.log(`[fal][${kind}] Retrying in ${retryDelayMs}ms... (${attempt}/${MAX_RETRIES})`);
+
+        // แจ้ง UI ว่ากำลัง retry
+        options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+
+      throw error;
+    }
   }
+
+  // ไม่ควร reach ถึงจุดนี้ แต่ TypeScript ต้องการ
+  throw new Error('Unexpected end of retry loop');
 };
+
 
 export const subscribeAnalysisEdit = async (input: EditImageInput, options?: EditSubscribeOptions) => subscribeEdit('analysis', input, options);
 
