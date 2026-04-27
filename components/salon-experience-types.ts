@@ -1,4 +1,4 @@
-export type FlowMode = 'analysis' | 'try-on';
+export type FlowMode = 'analysis' | 'try-on' | 'recolor';
 
 export type FlowStep = 'landing' | 'upload' | 'camera' | 'preview' | 'styles' | 'processing' | 'result';
 
@@ -10,6 +10,7 @@ export type HairstyleOption = {
   category: HairstyleCategory;
   description: string;
   prompt: string;
+  thumbnail?: string;
 };
 
 export type TryOnResult = {

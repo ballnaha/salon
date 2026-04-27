@@ -2,10 +2,12 @@
 
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, Button, Chip, IconButton, Stack, Typography, keyframes } from '@mui/material';
-import { ArrowRight, Camera, CloseCircle, FolderOpen, Magicpen, Refresh, TickCircle } from 'iconsax-react';
+import { ArrowRight, Brush, Camera, CloseCircle, Colorfilter, FolderOpen, Magicpen, Refresh, Refresh2, TickCircle, DocumentDownload, SearchNormal1 } from 'iconsax-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, FreeMode } from 'swiper/modules';
+import { FreeMode } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
+import { QRCodeSVG } from 'qrcode.react';
+import { Dialog, DialogContent, Fade } from '@mui/material';
 import { subscribeAnalysisEdit, subscribeTryOnEdit } from '@/components/salon-experience-fal';
 import { analysisPrompt, buildHairColorPrompt, buildTryOnPrompt } from '@/components/salon-experience-prompts';
 import { hairColorOptions, hairstyleOptions } from '@/components/salon-experience-styles';
@@ -17,7 +19,17 @@ const pulse = keyframes`
   100% { transform: scale(1); opacity: 0.6; }
 `;
 
-const shellBackground = 'radial-gradient(circle at center, #2d1b22 0%, #1a1114 100%)';
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
+const shellBackground = 'radial-gradient(circle at 0% 0%, #2d1b22 0%, #1a1114 50%, #0d0810 100%)';
+const accentRose = '#d993a4';
+const accentGold = '#e2b18a';
+const glassBg = 'rgba(255, 255, 255, 0.03)';
+const glassBorder = 'rgba(255, 255, 255, 0.08)';
+
 const defaultHairColorId = hairColorOptions[0]?.id ?? '';
 const MAX_INPUT_IMAGE_DIMENSION = 1280;
 const INPUT_IMAGE_QUALITY = 0.86;
@@ -99,16 +111,17 @@ async function mapWithConcurrency<T, R>(
   return results;
 }
 
-function AppWrapper({ children, bgcolor = 'white' }: { children: ReactNode; bgcolor?: string }) {
+function AppWrapper({ children, bgcolor = '#1a1114' }: { children: ReactNode; bgcolor?: string }) {
   return (
     <Box
       sx={{
         height: '100vh',
         width: '100vw',
-        bgcolor,
+        bgcolor: '#0d0810',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        fontFamily: '"Inter", sans-serif',
       }}
     >
       <Box
@@ -116,10 +129,21 @@ function AppWrapper({ children, bgcolor = 'white' }: { children: ReactNode; bgco
           height: '100vh',
           width: '100%',
           position: 'relative',
-          bgcolor,
+          background: shellBackground,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: '-10%',
+            right: '-10%',
+            width: '40%',
+            height: '40%',
+            background: 'radial-gradient(circle, rgba(217,147,164,0.05) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+            pointerEvents: 'none',
+          }
         }}
       >
         {children}
@@ -169,49 +193,38 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
             </Typography>
           </Stack>
 
-          <Stack direction="row" spacing={1.5} sx={{ width: '100%' }}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(3, 1fr)', 
+            gap: 1, 
+            width: '100%' 
+          }}>
             {/* AI Analysis tile */}
             <Box
               component="button"
               onClick={() => onSelect('analysis')}
               sx={{
-                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 1.5,
-                py: 3.5,
-                px: 1,
+                gap: 1,
+                py: 2,
+                px: 0.5,
                 bgcolor: '#0f172a',
-                borderRadius: 4,
+                borderRadius: 3,
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'transform 0.15s, opacity 0.15s',
-                '&:active': { transform: 'scale(0.96)', opacity: 0.85 },
+                transition: 'all 0.15s ease',
+                '&:active': { transform: 'scale(0.94)', opacity: 0.85 },
               }}
             >
-              <Box
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#d993a4',
-                }}
-              >
-                <Magicpen size={26} variant="Bold" color="currentColor" />
+              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d993a4' }}>
+                <Magicpen size={18} variant="Bold" color="currentColor" />
               </Box>
-              <Stack spacing={0.25} sx={{ alignItems: 'center' }}>
-                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1 }}>
-                  AI Analysis
-                </Typography>
-                <Typography sx={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.7rem', lineHeight: 1.4, textAlign: 'center' }}>
-                  วิเคราะห์ทรงผม
-                </Typography>
+              <Stack spacing={0} sx={{ alignItems: 'center' }}>
+                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Analysis</Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.55rem' }}>วิเคราะห์</Typography>
               </Stack>
             </Box>
 
@@ -220,46 +233,59 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
               component="button"
               onClick={() => onSelect('try-on')}
               sx={{
-                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 1.5,
-                py: 3.5,
-                px: 1,
+                gap: 1,
+                py: 2,
+                px: 0.5,
                 bgcolor: '#d993a4',
-                borderRadius: 4,
+                borderRadius: 3,
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'transform 0.15s, opacity 0.15s',
-                '&:active': { transform: 'scale(0.96)', opacity: 0.85 },
+                transition: 'all 0.15s ease',
+                '&:active': { transform: 'scale(0.94)', opacity: 0.85 },
               }}
             >
-              <Box
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  bgcolor: 'rgba(255,255,255,0.22)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#1a1114',
-                }}
-              >
-                <Camera size={26} variant="Bold" color="currentColor" />
+              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1a1114' }}>
+                <Camera size={18} variant="Bold" color="currentColor" />
               </Box>
-              <Stack spacing={0.25} sx={{ alignItems: 'center' }}>
-                <Typography sx={{ color: '#1a1114', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1 }}>
-                  Try-On
-                </Typography>
-                <Typography sx={{ color: 'rgba(26,17,20,0.55)', fontSize: '0.7rem', lineHeight: 1.4, textAlign: 'center' }}>
-                  ลองทรงผม
-                </Typography>
+              <Stack spacing={0} sx={{ alignItems: 'center' }}>
+                <Typography sx={{ color: '#1a1114', fontWeight: 800, fontSize: '0.72rem' }}>Try-On</Typography>
+                <Typography sx={{ color: 'rgba(26,17,20,0.5)', fontSize: '0.55rem' }}>ลองทรงผม</Typography>
               </Stack>
             </Box>
-          </Stack>
+
+            {/* Hair Color tile */}
+            <Box
+              component="button"
+              onClick={() => onSelect('recolor')}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1,
+                py: 2,
+                px: 0.5,
+                bgcolor: '#334155',
+                borderRadius: 3,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                '&:active': { transform: 'scale(0.94)', opacity: 0.85 },
+              }}
+            >
+              <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f1f5f9' }}>
+                <Brush size={18} variant="Bold" color="currentColor" />
+              </Box>
+              <Stack spacing={0} sx={{ alignItems: 'center' }}>
+                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Color</Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.55rem' }}>เปลี่ยนสี</Typography>
+              </Stack>
+            </Box>
+          </Box>
         </Box>
       </Box>
 
@@ -282,15 +308,15 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
         {/* Desktop card picker */}
         <Box sx={{ flex: 1, bgcolor: 'white', px: 6, py: 6, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <Stack spacing={3} sx={{ maxWidth: 460, mx: 'auto', width: '100%' }}>
-            <Stack spacing={1.5}>
-              <Typography variant="overline" sx={{ color: '#d993a4', letterSpacing: 4, fontWeight: 800 }}>
-                CHOOSE YOUR FLOW
+            <Stack spacing={2}>
+              <Typography variant="overline" sx={{ color: '#d993a4', letterSpacing: 4, fontWeight: 900, fontSize: '0.85rem' }}>
+                AI BEAUTY CONSULTANT
               </Typography>
-              <Typography variant="h4" sx={{ color: '#0f172a', fontWeight: 900, lineHeight: 1.1 }}>
-                เริ่มจากสิ่งที่ลูกค้าต้องการก่อน
+              <Typography variant="h3" sx={{ color: '#0f172a', fontWeight: 900, lineHeight: 1.1, fontSize: { sm: '2rem', md: '2.5rem' } }}>
+                ค้นหาสไตล์ที่ใช่สำหรับคุณ
               </Typography>
-              <Typography variant="body1" sx={{ color: '#64748b', lineHeight: 1.7 }}>
-                แยกเป็น 2 โหมดชัดเจน: ให้ AI วิเคราะห์ความเหมาะสม หรือให้ลูกค้าเลือกทรงยอดนิยมแล้วลองแบบจริง
+              <Typography variant="body1" sx={{ color: '#64748b', lineHeight: 1.7, fontSize: '1.15rem' }}>
+                สัมผัสประสบการณ์ออกแบบทรงผมอัจฉริยะด้วยระบบ AI
               </Typography>
             </Stack>
 
@@ -299,12 +325,12 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
               sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(15,23,42,0.08)' }}
             >
               <Stack direction="row" sx={{ width: '100%' }}>
-                <Stack spacing={1.25} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
-                  <Typography variant="h6" sx={{ color: '#0f172a', fontWeight: 800 }}>AI Analysis</Typography>
-                  <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.7 }}>
-                    วิเคราะห์โครงหน้า ทรงผมที่เหมาะ ทรงที่ควรเลี่ยง และสีผมที่แนะนำจากรูปของลูกค้า
+                <Stack spacing={1} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
+                  <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: 900, fontSize: '1.35rem' }}>AI Analysis</Typography>
+                  <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
+                    วิเคราะห์โครงหน้าและทรงผมที่เหมาะกับคุณที่สุด
                   </Typography>
-                  <Chip label="Vision + text recommendation" sx={{ bgcolor: '#f8e7ec', color: '#9f445e', fontWeight: 700 }} />
+                  <Chip label="Smart Analysis" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(217,147,164,0.12)', color: '#9f445e', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, bgcolor: '#111827', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Magicpen size={28} variant="Bold" />
@@ -317,15 +343,33 @@ function ModeSelectionStep({ onSelect }: { onSelect: (mode: FlowMode) => void })
               sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(15,23,42,0.08)' }}
             >
               <Stack direction="row" sx={{ width: '100%' }}>
-                <Stack spacing={1.25} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
-                  <Typography variant="h6" sx={{ color: '#0f172a', fontWeight: 800 }}>Try-On</Typography>
-                  <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.7 }}>
-                    เลือกทรงผมยอดนิยมของร้าน แล้วให้ AI จับคู่กับรูปจริงของลูกค้าเพื่อดูผลลัพธ์ก่อนทำ
+                <Stack spacing={1} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
+                  <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: 900, fontSize: '1.35rem' }}>AI Try-On</Typography>
+                  <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
+                    จำลองทรงผมใหม่ยอดนิยมของร้านก่อนเริ่มตัดจริง
                   </Typography>
-                  <Chip label="Multi-style image edit" sx={{ bgcolor: '#e8f5ee', color: '#1c7c54', fontWeight: 700 }} />
+                  <Chip label="Virtual Try-On" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(15,23,42,0.08)', color: '#0f172a', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, bgcolor: '#d993a4', color: '#1a1114', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ArrowRight size={28} variant="Linear" />
+                  <Camera size={28} variant="Bold" />
+                </Box>
+              </Stack>
+            </Button>
+
+            <Button
+              onClick={() => onSelect('recolor')}
+              sx={{ justifyContent: 'space-between', alignItems: 'stretch', p: 0, borderRadius: 4, overflow: 'hidden', textTransform: 'none', border: '1px solid rgba(15,23,42,0.08)' }}
+            >
+              <Stack direction="row" sx={{ width: '100%' }}>
+                <Stack spacing={1} sx={{ p: 3, flex: 1, alignItems: 'flex-start' }}>
+                  <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: 900, fontSize: '1.35rem' }}>Color Preview</Typography>
+                  <Typography variant="body2" sx={{ color: '#64748b', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
+                    ทดลองเฉดสีผมใหม่ๆ บนทรงผมเดิมของคุณ
+                  </Typography>
+                  <Chip label="AI Color" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(194,114,127,0.1)', color: '#c2727f', fontWeight: 900, borderRadius: 1.5 }} />
+                </Stack>
+                <Box sx={{ width: 88, bgcolor: '#334155', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Brush size={28} variant="Bold" />
                 </Box>
               </Stack>
             </Button>
@@ -357,6 +401,11 @@ function UploadStep({
     ? {
         title: 'เพิ่มรูปเพื่อวิเคราะห์ด้วย AI',
         subtitle: 'ภาพหน้าตรง แสงดี และเห็นกรอบหน้า จะช่วยให้คำแนะนำแม่นยำขึ้น',
+      }
+    : mode === 'recolor'
+    ? {
+        title: 'เพิ่มรูปเพื่อเปลี่ยนสีผม',
+        subtitle: 'ใช้รูปทรงผมเดิม แล้วให้ AI ช่วยจำลองสีผมใหม่ๆ ให้ลูกค้าตัดสินใจได้ง่ายขึ้น',
       }
     : {
         title: 'เพิ่มรูปเพื่อเริ่ม Try-On',
@@ -431,6 +480,12 @@ function PreviewStep({
         title: 'ตรวจสอบรูปภาพก่อนวิเคราะห์',
         action: 'วิเคราะห์ด้วย AI',
         description: 'AI จะสรุปทรงผมที่เหมาะ ทรงที่ควรเลี่ยง และสีผมที่แนะนำจากภาพนี้',
+      }
+    : mode === 'recolor'
+    ? {
+        title: 'ตรวจสอบรูปภาพก่อนเปลี่ยนสี',
+        action: 'ไปเลือกสีผม',
+        description: 'ยืนยันรูปภาพนี้เพื่อเริ่มลองเปลี่ยนเฉดสีผมใหม่ๆ โดยยังคงทรงผมเดิมของลูกค้าไว้',
       }
     : {
         title: 'ตรวจสอบรูปภาพก่อนเลือกทรงผม',
@@ -651,6 +706,8 @@ function StylePickerStep({
 }) {
   const [category, setCategory] = useState<'male' | 'female'>('male');
   const [showThumbnails, setShowThumbnails] = useState(true);
+  const [previewImage, setPreviewImage] = useState<{ url: string; label: string } | null>(null);
+
   const filtered = options.filter((o) => o.category === category);
   // Only highlight selections that belong to the current category
   const currentSelected = selectedIds.filter((id) => filtered.some((o) => o.id === id));
@@ -766,8 +823,9 @@ function StylePickerStep({
           zIndex: 10,
         }}
       >
-        {/* Info panel */}
-        <Box sx={{ ...glass, borderRadius: '20px 20px 16px 16px', p: { xs: 2, sm: 2.5 }, mb: 1 }}>
+        {/* Info panel + Horizontal scroll thumbnails */}
+        {showThumbnails && <>
+          <Box sx={{ ...glass, borderRadius: '20px 20px 16px 16px', p: { xs: 2, sm: 2.5 }, mb: 1.5 }}>
           <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.25 }}>
             <Stack spacing={0.25}>
               <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2 }}>
@@ -818,29 +876,46 @@ function StylePickerStep({
 
           {/* Selected style preview */}
           {firstSelectedInCategory && (
-            <Box sx={{ ...glass, borderRadius: 3, p: 1.5, display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+            <Box 
+              onClick={() => firstSelectedInCategory.thumbnail && setPreviewImage({ url: firstSelectedInCategory.thumbnail, label: firstSelectedInCategory.label })}
+              sx={{ ...glass, borderRadius: 3, p: 1.5, display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5, cursor: firstSelectedInCategory.thumbnail ? 'zoom-in' : 'default' }}
+            >
               <Box
                 sx={{
                   width: 52,
                   height: 52,
                   borderRadius: 2,
                   flexShrink: 0,
-                  background: firstSelectedInCategory.category === 'male'
-                    ? 'linear-gradient(135deg, rgba(125,211,252,0.5), rgba(56,189,248,0.3))'
-                    : 'linear-gradient(135deg, rgba(249,168,212,0.5), rgba(217,147,164,0.3))',
+                  backgroundImage: firstSelectedInCategory.thumbnail ? `url(${firstSelectedInCategory.thumbnail})` : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  background: !firstSelectedInCategory.thumbnail
+                    ? (firstSelectedInCategory.category === 'male'
+                      ? 'linear-gradient(135deg, rgba(125,211,252,0.5), rgba(56,189,248,0.3))'
+                      : 'linear-gradient(135deg, rgba(249,168,212,0.5), rgba(217,147,164,0.3))')
+                    : undefined,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Typography sx={{ color: 'white', fontWeight: 900, fontSize: '1.2rem' }}>
-                  {firstSelectedInCategory.label[0]}
-                </Typography>
+                {!firstSelectedInCategory.thumbnail && (
+                  <Typography sx={{ color: 'white', fontWeight: 900, fontSize: '1.2rem' }}>
+                    {firstSelectedInCategory.label[0]}
+                  </Typography>
+                )}
               </Box>
               <Stack spacing={0.15} sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ color: 'rgba(249,168,212,1)', fontWeight: 700, fontSize: '0.68rem' }}>
-                  ทรงที่เลือก
-                </Typography>
+                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ color: 'rgba(249,168,212,1)', fontWeight: 700, fontSize: '0.68rem' }}>
+                    ทรงที่เลือก
+                  </Typography>
+                  {firstSelectedInCategory.thumbnail && (
+                    <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.6rem' }}>
+                      แตะเพื่อดูรูปใหญ่
+                    </Typography>
+                  )}
+                </Stack>
                 <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.92rem', lineHeight: 1.1 }}>
                   {firstSelectedInCategory.label}
                 </Typography>
@@ -851,66 +926,97 @@ function StylePickerStep({
             </Box>
           )}
         </Box>
-
-        {/* Horizontal scroll thumbnails — Swiper carousel */}
-        {showThumbnails && (
-        <Box sx={{ mb: 1, '.swiper-pagination': { position: 'static', mt: 0.75 }, '.swiper-pagination-bullet': { bgcolor: 'rgba(255,255,255,0.35)', opacity: 1, width: 6, height: 6 }, '.swiper-pagination-bullet-active': { bgcolor: '#f9a8d4', width: 16, borderRadius: 99 } }}>
+        <Box sx={{ 
+            mb: 1.5, 
+            position: 'relative',
+            width: '100%',
+          }}>
           <Swiper
-            modules={[Pagination, FreeMode]}
-            freeMode
+            modules={[FreeMode]}
+            freeMode={{ sticky: true }}
             slidesPerView="auto"
-            spaceBetween={10}
-            pagination={{ clickable: true, dynamicBullets: false }}
-            style={{ paddingBottom: 28, paddingLeft: 4, paddingRight: 4 }}
+            watchSlidesProgress={true}
+            spaceBetween={14}
+            style={{ paddingTop: 8, paddingBottom: 10, paddingLeft: 4, paddingRight: 4 }}
           >
             {filtered.map((style) => {
               const selected = currentSelected.includes(style.id);
               return (
                 <SwiperSlide key={style.id} style={{ width: 'auto' }}>
                   <Box
-                    component="button"
-                    onClick={() => onToggle(style.id)}
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       gap: 0.5,
-                      background: 'none',
-                      border: 'none',
-                      cursor: selected || !isFull ? 'pointer' : 'not-allowed',
-                      p: 0,
+                      position: 'relative',
                       width: 72,
                       opacity: !selected && isFull ? 0.38 : 1,
                       transition: 'opacity 0.2s',
                     }}
                   >
                     <Box
+                      component="button"
+                      onClick={() => onToggle(style.id)}
                       sx={{
                         width: 62,
                         height: 62,
                         borderRadius: '50%',
-                        border: selected ? '2.5px solid #f9a8d4' : '2.5px solid rgba(255,255,255,0.28)',
+                        border: selected ? '2.5px solid #d993a4' : '2.5px solid rgba(255,255,255,0.15)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        transition: 'all 0.2s',
-                        transform: selected ? 'scale(1.08)' : 'scale(1)',
-                        background: selected
-                          ? (style.category === 'male'
-                            ? 'linear-gradient(135deg, rgba(125,211,252,0.6), rgba(56,189,248,0.45))'
-                            : 'linear-gradient(135deg, rgba(249,168,212,0.65), rgba(217,147,164,0.5))')
-                          : 'rgba(255,255,255,0.13)',
-                        backdropFilter: 'blur(22px)',
-                        WebkitBackdropFilter: 'blur(22px)',
-                        flexShrink: 0,
+                        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: selected ? 'scale(1.05)' : 'scale(1)',
+                        backgroundImage: style.thumbnail ? `url(${style.thumbnail})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        background: !style.thumbnail
+                          ? (selected
+                            ? 'linear-gradient(135deg, rgba(217,147,164,0.4), rgba(160,80,100,0.2))'
+                            : 'rgba(255,255,255,0.08)')
+                          : undefined,
+                        cursor: 'pointer',
+                        boxShadow: selected ? '0 0 15px rgba(217,147,164,0.3)' : 'none',
+                        p: 0,
+                        overflow: 'hidden',
+                        '&:active': { transform: 'scale(0.95)' },
                       }}
                     >
-                      <Typography sx={{ color: 'white', fontWeight: 900, fontSize: '1.1rem', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
-                        {style.label[0]}
-                      </Typography>
+                      {!style.thumbnail && (
+                        <Typography sx={{ color: 'white', fontWeight: 900, fontSize: '1.1rem', opacity: 0.8 }}>
+                          {style.label[0]}
+                        </Typography>
+                      )}
                     </Box>
-                    {/* Fixed-height label: 2 lines × 0.62rem × 1.3 ≈ 26px */}
-                    <Box sx={{ height: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+
+                    {/* Dedicated Preview Button */}
+                    {style.thumbnail && (
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewImage({ url: style.thumbnail!, label: style.label });
+                        }}
+                        sx={{
+                          position: 'absolute',
+                          top: -4,
+                          right: 4,
+                          width: 26,
+                          height: 26,
+                          bgcolor: 'white',
+                          color: '#1a1114',
+                          p: 0,
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                          zIndex: 2,
+                          '&:hover': { bgcolor: '#f1f5f9', transform: 'scale(1.15) rotate(5deg)' },
+                          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                      >
+                        <SearchNormal1 size={14} variant="Outline" color="currentColor" />
+                      </IconButton>
+                    )}
+
+                    <Box sx={{ height: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', cursor: 'pointer' }} onClick={() => onToggle(style.id)}>
                       <Typography
                         sx={{
                           color: selected ? 'white' : 'rgba(255,255,255,0.7)',
@@ -933,8 +1039,9 @@ function StylePickerStep({
               );
             })}
           </Swiper>
-        </Box>
-        )}
+          </Box>
+        </>
+        }
 
         {/* Action buttons */}
         <Stack direction="row" spacing={1.25}>
@@ -983,6 +1090,150 @@ function StylePickerStep({
           </Box>
         </Stack>
       </Box>
+
+      {/* Premium Hairstyle Preview Dialog */}
+      <Dialog
+        open={!!previewImage}
+        onClose={() => setPreviewImage(null)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              bgcolor: 'transparent',
+              backgroundImage: 'none',
+              boxShadow: 'none',
+              overflow: 'hidden',
+              borderRadius: '32px',
+              m: 2,
+            }
+          }
+        }}
+      >
+        {previewImage && (() => {
+          const style = options.find(o => o.id === (options.find(opt => opt.thumbnail === previewImage.url)?.id));
+          if (!style) return null;
+          const isSelected = selectedIds.includes(style.id);
+          const canSelect = isSelected || !isFull;
+
+          return (
+            <Box 
+              sx={{ 
+                position: 'relative',
+                background: 'linear-gradient(165deg, rgba(45, 27, 34, 0.9) 0%, rgba(13, 8, 16, 0.95) 100%)',
+                backdropFilter: 'blur(40px)',
+                WebkitBackdropFilter: 'blur(40px)',
+                borderRadius: '32px',
+                border: '1px solid rgba(255,255,255,0.15)',
+                overflow: 'hidden',
+                boxShadow: '0 40px 100px rgba(0,0,0,0.9)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Image Section - The Main Hero */}
+              <Box sx={{ position: 'relative', width: '100%', aspectRatio: '3/4', overflow: 'hidden' }}>
+                <Box
+                  component="img"
+                  src={previewImage.url}
+                  sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <Box 
+                  sx={{ 
+                    position: 'absolute', 
+                    inset: 0, 
+                    background: 'linear-gradient(to bottom, transparent 60%, rgba(13, 8, 16, 0.95) 100%)' 
+                  }} 
+                />
+                
+                {/* Close Button Overlay */}
+                <IconButton
+                  onClick={() => setPreviewImage(null)}
+                  sx={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    zIndex: 2,
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                  }}
+                  size="small"
+                >
+                  <CloseCircle size={20} variant="Bold" color="currentColor" />
+                </IconButton>
+
+                {/* Title Overlay */}
+                <Box sx={{ position: 'absolute', bottom: 24, left: 24, right: 24 }}>
+                  <Stack spacing={0.5}>
+                    <Typography sx={{ color: '#d993a4', fontWeight: 900, fontSize: '0.65rem', letterSpacing: 2, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                      PREMIUM SELECTION
+                    </Typography>
+                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 900, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                      {previewImage.label}
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Box>
+
+              {/* Minimalist Details Section */}
+              <Box sx={{ p: 3, pt: 2 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, mb: 3, fontSize: '0.85rem' }}>
+                  {style.description}
+                </Typography>
+
+
+                
+                <Stack direction="row" spacing={1.5}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => {
+                      onToggle(style.id);
+                      setPreviewImage(null);
+                    }}
+                    disabled={!canSelect}
+                    sx={{
+                      bgcolor: isSelected ? 'rgba(255,255,255,0.08)' : '#d993a4',
+                      color: isSelected ? 'white' : '#1a1114',
+                      border: isSelected ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                      borderRadius: '14px',
+                      py: 1.5,
+                      fontWeight: 900,
+                      fontSize: '0.9rem',
+                      textTransform: 'none',
+                      boxShadow: isSelected ? 'none' : '0 10px 20px rgba(217,147,164,0.3)',
+                      '&:hover': {
+                        bgcolor: isSelected ? 'rgba(255,255,255,0.12)' : '#c88293',
+                      }
+                    }}
+                    startIcon={isSelected ? <TickCircle variant="Bold" color="currentColor" /> : undefined}
+                  >
+                    {isSelected ? 'ยกเลิกการเลือกทรงนี้' : (isFull ? `เต็มแล้ว` : 'เลือกทรงนี้')}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => setPreviewImage(null)}
+                    sx={{ 
+                      borderRadius: '14px', 
+                      border: '1px solid rgba(255,255,255,0.1)', 
+                      color: 'rgba(255,255,255,0.4)',
+                      px: 3,
+                      textTransform: 'none',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    ปิด
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          );
+        })()}
+      </Dialog>
     </Box>
   );
 }
@@ -1021,7 +1272,8 @@ function ResultStep({
   errorMessage,
   selectedTryOnStyleId,
   onSelectTryOnStyle,
-  selectedHairColorId,
+  selectedHairColorIds = [],
+  activeColorId = '',
   onSelectHairColor,
   onGenerateHairColor,
   hairColorPreviewUrl,
@@ -1033,6 +1285,8 @@ function ResultStep({
   onClearColorCache,
   onRestart,
   onBackToUpload,
+  onRegenAnalysis,
+  colorPreviews,
 }: {
   mode: FlowMode;
   selectedImage: string;
@@ -1041,8 +1295,9 @@ function ResultStep({
   errorMessage: string | null;
   selectedTryOnStyleId: string | null;
   onSelectTryOnStyle: (styleId: string) => void;
-  selectedHairColorId: string;
-  onSelectHairColor: (colorId: string) => void;
+  selectedHairColorIds: string[];
+  activeColorId: string;
+  onSelectHairColor: (colorId: string, options?: { toggle?: boolean }) => void;
   onGenerateHairColor: () => void;
   hairColorPreviewUrl: string;
   isGeneratingHairColor: boolean;
@@ -1053,12 +1308,14 @@ function ResultStep({
   onClearColorCache: () => void;
   onRestart: () => void;
   onBackToUpload: () => void;
+  onRegenAnalysis?: () => void;
+  colorPreviews: Record<string, string>;
 }) {
   const hasTryOnResults = tryOnResults.length > 0;
   const selectedTryOnResult = tryOnResults.find((result) => result.styleId === selectedTryOnStyleId) ?? tryOnResults[0] ?? null;
-  const selectedHairColor = hairColorOptions.find((color) => color.id === selectedHairColorId) ?? null;
-  const currentCacheKey = selectedTryOnResult && selectedHairColor ? `${selectedTryOnResult.styleId}_${selectedHairColor.id}` : null;
-  const isCurrentCached = currentCacheKey ? !!hairColorPreviewUrl : false;
+  const activeColor = hairColorOptions.find((color) => color.id === activeColorId) ?? null;
+  const selectedColorCount = selectedHairColorIds?.length ?? 0;
+  const isCurrentActiveCached = !!hairColorPreviewUrl;
   const generationTimeLabel = generationDurationMs ? formatElapsedMs(generationDurationMs) : null;
   const timingItems = [
     { label: 'ส่งคำขอ', value: formatTimingValue(generationTimingBreakdown?.submitMs ?? null) },
@@ -1068,19 +1325,20 @@ function ResultStep({
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
 
-  const handleDownloadAnalysisImage = async () => {
-    if (!analysisImageUrl || isDownloading) {
-      return;
-    }
+  const activeImageUrl = mode === 'analysis' ? analysisImageUrl : (hairColorPreviewUrl || selectedTryOnResult?.imageUrl || '');
 
+  const handleDownloadActiveImage = async () => {
+    if (!activeImageUrl || isDownloading) return;
+    
     const fallbackOpen = () => {
-      window.open(analysisImageUrl, '_blank', 'noopener,noreferrer');
+      window.open(activeImageUrl, '_blank', 'noopener,noreferrer');
     };
 
     setIsDownloading(true);
     try {
-      const response = await fetch(analysisImageUrl);
+      const response = await fetch(activeImageUrl);
       if (!response.ok) {
         fallbackOpen();
         return;
@@ -1090,18 +1348,143 @@ function ResultStep({
       const objectUrl = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const prefix = mode === 'analysis' ? 'salon-ai-analysis' : `salon-ai-${activeColor?.label || 'style'}`;
+      const filename = `${prefix}-${timestamp}.png`;
+      
       anchor.href = objectUrl;
-      anchor.download = `hair-analysis-${timestamp}.png`;
+      anchor.download = filename;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch {
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 100);
+    } catch (error) {
+      console.error('Download failed:', error);
       fallbackOpen();
     } finally {
       setIsDownloading(false);
     }
   };
+
+  const qrModal = (
+    <Dialog 
+      open={showQrModal} 
+      onClose={() => setShowQrModal(false)}
+      slots={{ transition: Fade }}
+      slotProps={{
+        paper: {
+          sx: {
+            bgcolor: 'transparent',
+            backgroundImage: 'none',
+            boxShadow: 'none',
+            overflow: 'visible'
+          }
+        }
+      }}
+    >
+      <DialogContent sx={{ p: 0, overflow: 'visible' }}>
+        <Box sx={{ 
+          width: { xs: '90vw', sm: 400 },
+          bgcolor: '#1a1114',
+          borderRadius: 6,
+          border: '1px solid rgba(255,255,255,0.1)',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+          p: 4
+        }}>
+          {/* Decorative Glow */}
+          <Box sx={{ position: 'absolute', top: -100, right: -100, width: 200, height: 200, background: 'radial-gradient(circle, rgba(217,147,164,0.12) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+
+          <Stack spacing={4} sx={{ alignItems: 'center', position: 'relative', zIndex: 1 }}>
+            {/* Header */}
+            <Stack spacing={1} sx={{ alignItems: 'center' }}>
+              <Typography variant="overline" sx={{ color: '#d993a4', fontWeight: 800, letterSpacing: 3, fontSize: '0.65rem' }}>
+                SAVE YOUR STYLE
+              </Typography>
+              <Typography sx={{ color: 'white', fontWeight: 900, fontSize: '1.5rem', textAlign: 'center' }}>
+                บันทึกรูปภาพ
+              </Typography>
+            </Stack>
+
+            {/* Option 1: QR Code */}
+            <Stack spacing={2} sx={{ alignItems: 'center', width: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'rgba(255,255,255,0.4)' }}>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.06)', width: 40 }} />
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em' }}>สแกนเพื่อรับรูปในมือถือ</Typography>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.06)', width: 40 }} />
+              </Box>
+              
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: 'white', 
+                borderRadius: 4, 
+                display: 'flex', 
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                transform: 'rotate(-1deg)',
+                transition: 'transform 0.3s ease',
+                '&:hover': { transform: 'rotate(0deg) scale(1.02)' }
+              }}>
+                {activeImageUrl.startsWith('data:') ? (
+                  <Box sx={{ width: 180, height: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#f8f9fa', borderRadius: 2, p: 2 }}>
+                    <Refresh size={32} color="#d1d5db" className="animate-spin" style={{ marginBottom: 12 }} />
+                    <Typography sx={{ color: '#1a1114', fontSize: '0.7rem', fontWeight: 700, textAlign: 'center' }}>
+                      กำลังเตรียม QR Code...
+                    </Typography>
+                  </Box>
+                ) : (
+                  <QRCodeSVG 
+                    value={activeImageUrl} 
+                    size={180}
+                    level="M"
+                    includeMargin={false}
+                  />
+                )}
+              </Box>
+            </Stack>
+
+            {/* Option 2: Direct Download */}
+            <Stack spacing={2} sx={{ width: '100%', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'rgba(255,255,255,0.4)' }}>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.06)', width: 40 }} />
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em' }}>บันทึกลงเครื่องนี้</Typography>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.06)', width: 40 }} />
+              </Box>
+
+              <Button 
+                fullWidth 
+                variant="contained" 
+                onClick={handleDownloadActiveImage}
+                disabled={isDownloading}
+                startIcon={isDownloading ? <Refresh size={20} className="animate-spin" /> : <DocumentDownload size={20} variant="Bold" color="currentColor" />}
+                sx={{ 
+                  bgcolor: '#d993a4', 
+                  color: '#1a1114', 
+                  borderRadius: 3, 
+                  py: 2, 
+                  fontWeight: 900, 
+                  fontSize: '1rem',
+                  textTransform: 'none',
+                  boxShadow: '0 8px 24px rgba(217,147,164,0.2)',
+                  '&:hover': { bgcolor: '#c88293', transform: 'translateY(-2px)' },
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isDownloading ? 'กำลังบันทึก...' : 'ดาวน์โหลดรูปภาพ'}
+              </Button>
+
+              <Button 
+                onClick={() => setShowQrModal(false)}
+                sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'none', '&:hover': { color: 'white' } }}
+              >
+                ปิดหน้าต่าง
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+      </DialogContent>
+    </Dialog>
+  );
+
 
   if (mode === 'analysis') {
     return (
@@ -1153,7 +1536,30 @@ function ResultStep({
             </Stack>
             <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', md: 'auto' } }}>
               <Button
-                onClick={handleDownloadAnalysisImage}
+                onClick={onRegenAnalysis}
+                size="small"
+                sx={{ 
+                  color: 'rgba(255,255,255,0.7)', 
+                  borderColor: 'rgba(255,255,255,0.15)', 
+                  border: '1px solid', 
+                  borderRadius: { xs: 3, sm: 2.5 }, 
+                  px: { xs: 1.5, sm: 2 }, 
+                  py: { xs: 1, sm: 0.75 }, 
+                  minHeight: { xs: 44, sm: 34 }, 
+                  minWidth: 0, 
+                  flex: { xs: 1, md: '0 0 auto' }, 
+                  textTransform: 'none', 
+                  fontWeight: 600, 
+                  fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.3)' }
+                }}
+                startIcon={<Refresh2 size={16} color="currentColor" />}
+              >
+                วิเคราะห์ใหม่
+              </Button>
+
+              <Button
+                onClick={() => setShowQrModal(true)}
                 disabled={!analysisImageUrl || isDownloading}
                 size="small"
                 sx={{ color: 'rgba(255,255,255,0.86)', borderColor: 'rgba(255,255,255,0.28)', border: '1px solid', borderRadius: { xs: 3, sm: 2.5 }, px: { xs: 1, sm: 2.25 }, py: { xs: 1, sm: 0.75 }, minHeight: { xs: 44, sm: 34 }, minWidth: 0, flex: { xs: 1, md: '0 0 auto' }, textTransform: 'none', fontWeight: 700, fontSize: { xs: '0.8rem', sm: '0.875rem' }, lineHeight: 1.15, whiteSpace: 'nowrap', touchAction: 'manipulation' }}
@@ -1221,6 +1627,7 @@ function ResultStep({
             </Typography>
           )}
         </Box>
+        {qrModal}
       </AppWrapper>
     );
   }
@@ -1228,48 +1635,70 @@ function ResultStep({
   return (
     <AppWrapper bgcolor="#0d0810">
       <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-        {/* ── Top bar ── */}
-        <Stack direction="row"
-          sx={{ px: { xs: 2, md: 3 }, py: { xs: 1.25, md: 1.75 }, flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Stack spacing={0.35}>
-            <Typography sx={{ color: 'white', fontWeight: 800, fontSize: { xs: '0.95rem', md: '1.1rem' } }}>
-              ลองทรงผม
+        {/* ── Header: Glass bar ── */}
+        <Stack direction="row" sx={{ px: { xs: 2, md: 3 }, py: { xs: 1.5, md: 2 }, alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', bgcolor: 'rgba(13,8,16,0.2)', backdropFilter: 'blur(20px)', zIndex: 10 }}>
+          <Stack spacing={1}>
+            <Typography variant="overline" sx={{ color: '#d993a4', letterSpacing: 3, fontWeight: 800, fontSize: '0.62rem', opacity: 0.8 }}>
+              SIMULATION GALLERY
             </Typography>
-            {generationTimeLabel && (
-              <Typography sx={{ color: 'rgba(251,207,232,0.82)', fontSize: '0.75rem', fontWeight: 700 }}>
-                ใช้เวลา {generationTimeLabel}
-              </Typography>
-            )}
             {timingItems.length > 0 && (
-              <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', rowGap: 0.75, pt: 0.35 }}>
+              <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', rowGap: 0.75 }}>
                 {timingItems.map((item) => (
-                  <Chip
+                  <Box
                     key={item.label}
-                    label={`${item.label} ${item.value}`}
-                    size="small"
                     sx={{
-                      bgcolor: 'rgba(255,255,255,0.08)',
-                      color: 'rgba(255,255,255,0.72)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      fontWeight: 600,
-                      height: 22,
-                      '& .MuiChip-label': { px: 0.9 },
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.6,
+                      px: 1,
+                      py: 0.35,
+                      bgcolor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: 1.5,
                     }}
-                  />
+                  >
+                    <Typography sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.55rem', fontWeight: 700, textTransform: 'uppercase' }}>{item.label}</Typography>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.6rem', fontWeight: 800 }}>{item.value}</Typography>
+                  </Box>
                 ))}
               </Stack>
             )}
           </Stack>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button size="small" onClick={onBackToUpload}
-              sx={{ color: 'rgba(255,255,255,0.55)', textTransform: 'none', fontWeight: 600, minHeight: 36, px: 1.5, borderRadius: 2, '&:hover': { bgcolor: 'rgba(255,255,255,0.07)' } }}>
-              ใช้รูปใหม่
+          <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+            <Button 
+              onClick={() => setShowQrModal(true)}
+              disabled={!selectedTryOnResult && !hairColorPreviewUrl}
+              startIcon={<DocumentDownload size={18} variant="Bold" color="currentColor" />}
+              sx={{ 
+                color: '#1a1114', 
+                bgcolor: '#d993a4', 
+                textTransform: 'none', 
+                fontWeight: 800, 
+                height: 42, 
+                px: { xs: 1.5, sm: 2.25 }, 
+                borderRadius: 2.5, 
+                boxShadow: '0 4px 12px rgba(217,147,164,0.2)',
+                '&:hover': { bgcolor: '#c88293', transform: 'translateY(-1px)' },
+                transition: 'all 0.2s ease',
+                '&.Mui-disabled': { color: 'rgba(255,255,255,0.15)', bgcolor: 'rgba(255,255,255,0.04)' }
+              }}>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>ดาวน์โหลด</Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>บันทึก</Box>
             </Button>
-            <Button size="small" variant="contained" startIcon={<TickCircle variant="Bold" />} onClick={onRestart}
-              sx={{ bgcolor: '#c2727f', color: 'white', borderRadius: 2, fontWeight: 700, textTransform: 'none', minHeight: 36, px: 1.75, '&:hover': { bgcolor: '#b5636f' } }}>
-              เสร็จสิ้น
-            </Button>
+            <IconButton 
+              onClick={onRestart} 
+              sx={{ 
+                bgcolor: 'rgba(255,255,255,0.05)', 
+                color: 'white', 
+                width: 42, 
+                height: 42, 
+                borderRadius: 2.5, 
+                border: '1px solid rgba(255,255,255,0.08)', 
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } 
+              }}
+            >
+              <TickCircle variant="Bold" size={20} color="currentColor" />
+            </IconButton>
           </Stack>
         </Stack>
 
@@ -1279,33 +1708,93 @@ function ResultStep({
           {/* ── Left / Top: Feature image + filmstrip ── */}
           <Box sx={{ position: 'relative', width: { xs: '100%', md: '56%' }, flexShrink: 0, bgcolor: '#0d0810', display: 'flex', flexDirection: 'column' }}>
             {/* Big featured image */}
-            <Box sx={{ width: '100%', aspectRatio: { xs: '1/1', md: 'unset' }, flex: { md: 1 }, position: 'relative', minHeight: { md: 0 } }}>
+            <Box sx={{ 
+              width: '100%', 
+              aspectRatio: '2/3', 
+              position: 'relative',
+              overflow: 'hidden',
+              borderRadius: { xs: 0, md: 4 },
+              bgcolor: '#0d0810',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+            }}>
               {selectedTryOnResult ? (
                 <Box component="img"
                   src={hairColorPreviewUrl || selectedTryOnResult.imageUrl}
                   alt={selectedTryOnResult.styleLabel}
-                  sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  sx={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover', 
+                    objectPosition: 'center top',
+                    display: 'block',
+                    filter: isGeneratingHairColor && !hairColorPreviewUrl ? 'blur(4px) grayscale(0.5)' : 'none',
+                    transition: 'filter 0.3s ease'
+                  }}
                 />
               ) : (
                 <Box sx={{ width: '100%', height: '100%', minHeight: { xs: 260, md: 320 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Typography sx={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem' }}>ยังไม่มีภาพ</Typography>
                 </Box>
               )}
+
+              {/* Loading Overlay for Hair Color */}
+              {isGeneratingHairColor && !hairColorPreviewUrl && (
+                <Box sx={{ 
+                  position: 'absolute', 
+                  inset: 0, 
+                  bgcolor: 'rgba(13,8,16,0.5)', 
+                  backdropFilter: 'blur(8px)',
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: 2,
+                  zIndex: 2
+                }}>
+                  <Box sx={{ 
+                    width: 44, 
+                    height: 44, 
+                    borderRadius: '50%', 
+                    border: '3px solid rgba(255,255,255,0.1)', 
+                    borderTopColor: '#d993a4', 
+                    animation: `${spin} 1s linear infinite` 
+                  }} />
+                  <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.02em', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                    กำลังจำลองสีผม...
+                  </Typography>
+                </Box>
+              )}
               {/* Gradient + label overlay */}
               {selectedTryOnResult && (
-                <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', px: 2, pt: 3, pb: 1.25 }}>
-                  <Typography sx={{ color: 'white', fontWeight: 700, fontSize: { xs: '0.88rem', md: '0.95rem' } }}>
-                    {selectedTryOnResult.styleLabel}
-                    {hairColorPreviewUrl && selectedHairColor ? (
-                      <Box component="span" sx={{ color: '#fbcfe8', ml: 0.75 }}>· {selectedHairColor.label}</Box>
-                    ) : null}
-                  </Typography>
+                <Box sx={{ 
+                  position: 'absolute', 
+                  bottom: 0, left: 0, right: 0, 
+                  background: 'linear-gradient(to top, rgba(13,8,16,0.95) 0%, rgba(13,8,16,0.6) 40%, transparent 100%)', 
+                  px: 2.5, pt: 5, pb: 2,
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between'
+                }}>
+                  <Stack spacing={0.2}>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                      {mode === 'recolor' ? 'Original Style' : 'AI Try-On Result'}
+                    </Typography>
+                    <Typography sx={{ color: 'white', fontWeight: 800, fontSize: { xs: '1.05rem', md: '1.2rem' }, letterSpacing: '-0.01em' }}>
+                      {selectedTryOnResult.styleLabel}
+                      {activeColor && (hairColorPreviewUrl || mode === 'recolor') ? (
+                        <Box component="span" sx={{ color: '#d993a4', ml: 1, fontWeight: 500 }}></Box>
+                      ) : null}
+                    </Typography>
+                  </Stack>
+                  <Box sx={{ bgcolor: 'rgba(217,147,164,0.15)', border: '1px solid rgba(217,147,164,0.4)', color: '#fbcfe8', px: 1.2, py: 0.4, borderRadius: 1.5, fontSize: '0.62rem', fontWeight: 900, letterSpacing: '0.05em', backdropFilter: 'blur(8px)' }}>
+                    SALON EXCLUSIVE
+                  </Box>
                 </Box>
               )}
             </Box>
 
             {/* Hairstyle filmstrip */}
-            {hasTryOnResults && (
+            {hasTryOnResults && mode !== 'recolor' && (
               <Stack direction="row" spacing={1.25}
                 sx={{ overflowX: 'auto', flexShrink: 0, px: 1.75, py: 1.5, bgcolor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)', '&::-webkit-scrollbar': { display: 'none' } }}>
                 {tryOnResults.map((result) => {
@@ -1314,7 +1803,7 @@ function ResultStep({
                     <Box key={result.styleId} component="button" onClick={() => onSelectTryOnStyle(result.styleId)}
                       sx={{ p: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0, width: { xs: 64, md: 76 }, textAlign: 'center' }}>
                       <Box sx={{ borderRadius: 2, overflow: 'hidden', border: selected ? '2.5px solid #f9a8d4' : '2.5px solid transparent', transition: 'border-color 0.15s', boxShadow: selected ? '0 0 0 1px rgba(249,168,212,0.3)' : 'none' }}>
-                        <Box sx={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden' }}>
+                        <Box sx={{ width: '100%', aspectRatio: '2/3', overflow: 'hidden' }}>
                           <Box component="img" src={result.imageUrl} alt={result.styleLabel} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </Box>
                       </Box>
@@ -1330,100 +1819,213 @@ function ResultStep({
 
           {/* ── Right / Bottom: Controls ── */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', bgcolor: '#1a1114' }}>
-
             {/* Color picker section */}
-            <Box sx={{ px: { xs: 2, md: 2.5 }, pt: { xs: 2, md: 2.5 }, pb: { xs: 2, md: 2.5 }, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1.25 }}>
-                <Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  เลือกสีผม
-                </Typography>
+            <Box sx={{ px: { xs: 2.5, md: 3 }, pt: 3, pb: 3, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+                <Stack spacing={0.3}>
+                  <Typography sx={{ color: 'white', fontSize: '0.95rem', fontWeight: 800 }}>
+                    Color Palette
+                  </Typography>
+                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem', fontWeight: 500 }}>
+                    เลือกเฉดสีที่ต้องการจำลอง (เลือกได้หลายสี)
+                  </Typography>
+                </Stack>
                 {colorCacheCount > 0 && (
                   <Button size="small" onClick={onClearColorCache}
-                    sx={{ color: 'rgba(255,255,255,0.35)', textTransform: 'none', fontSize: '0.65rem', fontWeight: 600, minHeight: 0, py: 0.3, px: 0.9, borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.1)', lineHeight: 1.3, '&:hover': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' } }}>
-                    ล้าง cache ({colorCacheCount})
+                    sx={{ color: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.62rem', fontWeight: 700, minHeight: 0, py: 0.4, px: 1, borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', color: 'white' } }}>
+                    Reset Cache
                   </Button>
                 )}
               </Stack>
-              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75, mb: 1.75 }}>
-                {hairColorOptions.map((color) => {
-                  const selected = color.id === selectedHairColorId;
-                  return (
-                    <Box key={color.id} component="button" onClick={() => onSelectHairColor(color.id)}
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.6, px: 1.1, py: 0.5, borderRadius: 99, border: selected ? '1.5px solid #f9a8d4' : '1.5px solid rgba(255,255,255,0.13)', background: selected ? 'rgba(249,168,212,0.13)' : 'rgba(255,255,255,0.04)', color: selected ? '#fbcfe8' : 'rgba(255,255,255,0.75)', cursor: 'pointer', minHeight: 30, transition: 'all 0.15s' }}>
-                      <Box sx={{ width: 11, height: 11, borderRadius: '50%', bgcolor: color.swatch, border: '1px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
-                      <Typography sx={{ fontSize: '0.72rem', fontWeight: selected ? 700 : 500, lineHeight: 1 }}>{color.label}</Typography>
-                    </Box>
-                  );
-                })}
+
+              {/* Categorized Swatches */}
+              <Stack spacing={2.5} sx={{ mb: 3 }}>
+                {['Natural & Dark', 'Fashion & Ash', 'Warm & Beige'].map(cat => (
+                  <Box key={cat}>
+                    <Typography sx={{ color: '#d993a4', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 1.25, opacity: 0.8 }}>
+                      {cat}
+                    </Typography>
+                    <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+                      {hairColorOptions.filter(c => c.category === cat).map((color) => {
+                        const isSelected = selectedHairColorIds.includes(color.id);
+                        const isActive = color.id === activeColorId;
+                        return (
+                          <Box key={color.id} component="button" onClick={() => onSelectHairColor(color.id)}
+                            sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: 1.1, 
+                              pl: 0.8, pr: isSelected ? 1.6 : 1.8, 
+                              py: 0.8, 
+                              borderRadius: 99, 
+                              border: isActive ? `2.5px solid ${accentRose}` : isSelected ? `1.5px solid rgba(217,147,164,0.5)` : '1.5px solid rgba(255,255,255,0.06)', 
+                              background: (isActive || isSelected) ? '#fff' : 'rgba(255,255,255,0.02)', 
+                              color: (isActive || isSelected) ? '#1a1114' : 'rgba(255,255,255,0.5)', 
+                              cursor: 'pointer', 
+                              minHeight: 40, 
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                              boxShadow: isActive ? `0 8px 24px rgba(217,147,164,0.35)` : isSelected ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                              zIndex: isActive ? 2 : 1,
+                              '&:hover': {
+                                background: (isActive || isSelected) ? '#fff' : 'rgba(255,255,255,0.08)',
+                                borderColor: isActive ? accentRose : isSelected ? accentRose : 'rgba(255,255,255,0.18)',
+                                transform: isActive ? 'scale(1.08)' : 'scale(1.03)',
+                              }
+                            }}>
+                            <Box sx={{ 
+                              width: 24, height: 24, borderRadius: '50%', 
+                              bgcolor: color.swatch, 
+                              border: '2px solid rgba(255,255,255,0.3)', 
+                              flexShrink: 0,
+                              position: 'relative',
+                              overflow: 'hidden',
+                              '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                top: -2, left: -2, right: -2, bottom: -2,
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 60%)',
+                                borderRadius: '50%'
+                              }
+                            }} />
+                            <Typography sx={{ fontSize: '0.78rem', fontWeight: isSelected || isActive ? 900 : 500, lineHeight: 1, letterSpacing: '0.01em' }}>{color.label}</Typography>
+                            {isSelected && (
+                              <TickCircle size={16} variant="Bold" color={isActive ? accentRose : '#f9a8d4'} style={{ marginLeft: -2 }} />
+                            )}
+                          </Box>
+                        );
+                      })}
+                    </Stack>
+                  </Box>
+                ))}
               </Stack>
+
               <Button fullWidth variant="contained"
                 onClick={onGenerateHairColor}
-                disabled={!selectedTryOnResult || !selectedHairColor || isGeneratingHairColor}
-                sx={{ bgcolor: isCurrentCached ? 'rgba(194,114,127,0.35)' : '#c2727f', color: 'white', borderRadius: 2.5, fontWeight: 800, textTransform: 'none', minHeight: 46, fontSize: '0.9rem', border: isCurrentCached ? '1px solid #c2727f' : 'none', '&:hover': { bgcolor: isCurrentCached ? 'rgba(194,114,127,0.5)' : '#b5636f' }, '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.2)' } }}>
-                {isGeneratingHairColor ? 'กำลังสร้างพรีวิว...' : isCurrentCached ? '✓ มีผลแล้ว (แสดงใหม่)' : 'ดูตัวอย่างสีผม'}
+                disabled={!selectedTryOnResult || selectedColorCount === 0 || isGeneratingHairColor}
+                sx={{ 
+                  background: isCurrentActiveCached 
+                    ? 'rgba(255,255,255,0.02)' 
+                    : `linear-gradient(135deg, ${accentRose} 0%, #c2727f 100%)`, 
+                  color: isCurrentActiveCached ? accentRose : '#1a1114', 
+                  borderRadius: 3, 
+                  fontWeight: 900, 
+                  textTransform: 'none', 
+                  minHeight: 56, 
+                  fontSize: '0.95rem', 
+                  letterSpacing: '0.04em',
+                  border: isCurrentActiveCached ? `1px solid rgba(217,147,164,0.3)` : 'none', 
+                  boxShadow: isCurrentActiveCached ? 'none' : '0 12px 32px rgba(194,114,127,0.35)',
+                  '&:hover': { 
+                    background: isCurrentActiveCached ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, #e2a3b2 0%, #b5636f 100%)`,
+                    transform: isCurrentActiveCached ? 'none' : 'translateY(-2px)'
+                  }, 
+                  transition: 'all 0.3s ease',
+                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.12)' } 
+                }}>
+                {isGeneratingHairColor ? 'กำลังวิเคราะห์และจำลองสี...' : (selectedColorCount > 1 ? `จำลองสีผมที่เลือก (${selectedColorCount} เฉดสี)` : 'จำลองสีผมอัจฉริยะ')}
               </Button>
               {hairColorErrorMessage && (
-                <Typography sx={{ color: '#fda4af', fontSize: '0.75rem', mt: 1, lineHeight: 1.5 }}>{hairColorErrorMessage}</Typography>
+                <Typography sx={{ color: '#fda4af', fontSize: '0.75rem', mt: 1.5, textAlign: 'center', fontWeight: 500 }}>{hairColorErrorMessage}</Typography>
               )}
             </Box>
 
-            {/* Before / After comparison */}
-            <Box sx={{ px: { xs: 2, md: 2.5 }, pt: { xs: 2, md: 2.5 }, pb: { xs: 2, md: 2.5 }, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 1.25 }}>
-                เปรียบเทียบก่อน-หลัง
+            {/* Simulation Gallery - Vertical Grid */}
+            <Box sx={{ px: { xs: 2.5, md: 3 }, pt: 3, pb: 4 }}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 2.5 }}>
+                Comparison Gallery
               </Typography>
-              <Stack direction="row" spacing={1}>
-                {/* Original photo */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', mb: 0.6 }}>ภาพลูกค้า</Typography>
-                  <Box sx={{ width: '100%', aspectRatio: '1/1', borderRadius: 2.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.09)' }}>
-                    <Box component="img" src={selectedImage} alt="Original" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              <Stack spacing={4}>
+                {/* Reference Row: Original & New Style */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', fontWeight: 700, mb: 1, textTransform: 'uppercase' }}>Original</Typography>
+                    <Box sx={{ width: '100%', aspectRatio: '2/3', borderRadius: 2.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', bgcolor: '#0d0810' }}>
+                      <Box component="img" src={selectedImage} alt="Original" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.8 }} />
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', fontWeight: 700, mb: 1, textTransform: 'uppercase' }}>New Style</Typography>
+                    <Box sx={{ width: '100%', aspectRatio: '2/3', borderRadius: 2.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0d0810' }}>
+                      {selectedTryOnResult ? (
+                        <Box component="img" src={selectedTryOnResult.imageUrl} alt="Hairstyle" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+                      ) : (
+                        <Typography sx={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.6rem' }}>-</Typography>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
-                {/* Try-on result */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', mb: 0.6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {selectedTryOnResult ? selectedTryOnResult.styleLabel : 'ทรงผม'}
-                  </Typography>
-                  <Box sx={{ width: '100%', aspectRatio: '1/1', borderRadius: 2.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.03)' }}>
-                    {selectedTryOnResult ? (
-                      <Box component="img" src={selectedTryOnResult.imageUrl} alt="Hairstyle" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <Typography sx={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.65rem', textAlign: 'center', px: 1 }}>เลือกทรงผม</Typography>
-                    )}
+
+                {/* Color Simulations - Grid of New Styles only */}
+                {selectedHairColorIds.length > 0 && (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+                    {selectedHairColorIds.map(colorId => {
+                      const color = hairColorOptions.find(c => c.id === colorId);
+                      if (!color) return null;
+
+                      const styleCacheKey = `${selectedTryOnStyleId ?? 'original'}_${colorId}`;
+                      const stylePreviewUrl = colorPreviews[styleCacheKey];
+                      const isActive = colorId === activeColorId;
+
+                      return (
+                        <Box key={colorId}>
+                          <Box 
+                            onClick={() => onSelectHairColor(colorId, { toggle: false })}
+                            sx={{ 
+                              width: '100%', 
+                              aspectRatio: '2/3', 
+                              borderRadius: 3.5, 
+                              overflow: 'hidden', 
+                              border: isActive ? '2.5px solid #d993a4' : '1px solid rgba(255,255,255,0.08)', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              bgcolor: color.swatch, 
+                              position: 'relative',
+                              cursor: 'pointer',
+                              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                              boxShadow: isActive ? '0 10px 30px rgba(13,8,16,0.8), 0 0 15px rgba(217,147,164,0.1)' : 'none',
+                              '&:hover': { transform: 'scale(1.02)' }
+                            }}
+                          >
+                            {stylePreviewUrl ? (
+                              <Box component="img" src={stylePreviewUrl} alt={color.label} sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+                            ) : (
+                              <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${color.swatch}88 0%, ${color.swatch} 100%)`, opacity: 0.4 }}>
+                                <Refresh size={18} color="white" className="spin-animation" style={{ opacity: 0.5 }} />
+                              </Box>
+                            )}
+
+                            {/* Overlay Label */}
+                            <Box sx={{ 
+                              position: 'absolute', bottom: 0, left: 0, right: 0, 
+                              background: 'linear-gradient(to top, rgba(13,8,16,0.95) 0%, transparent 100%)', 
+                              px: 1.5, pt: 3, pb: 1.25,
+                              display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                            }}>
+                              <Typography sx={{ color: isActive ? '#f9a8d4' : 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 800 }}>
+                                {color.label}
+                              </Typography>
+                              {isActive && (
+                                <TickCircle size={14} variant="Bold" color="#d993a4" />
+                              )}
+                            </Box>
+                          </Box>
+                        </Box>
+                      );
+                    })}
                   </Box>
-                </Box>
-                {/* Color preview */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', mb: 0.6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {selectedHairColor ? selectedHairColor.label : 'สีผม'}
-                  </Typography>
-                  <Box sx={{ width: '100%', aspectRatio: '1/1', borderRadius: 2.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.03)' }}>
-                    {hairColorPreviewUrl ? (
-                      <Box component="img" src={hairColorPreviewUrl} alt="Color preview" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <Typography sx={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.65rem', textAlign: 'center', px: 1 }}>ยังไม่มีพรีวิว</Typography>
-                    )}
-                  </Box>
-                </Box>
+                )}
               </Stack>
             </Box>
-
-            {/* Error + note */}
-            <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.5 }}>
-              {errorMessage && (
-                <Typography sx={{ color: '#fda4af', fontSize: '0.75rem', mb: 1, lineHeight: 1.5 }}>{errorMessage}</Typography>
-              )}
-              <Typography sx={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.68rem', lineHeight: 1.6 }}>
-                * AI เปลี่ยนเฉพาะสีผม คงทรงผมและลักษณะใบหน้าเดิม
-              </Typography>
             </Box>
           </Box>
         </Box>
-      </Box>
-    </AppWrapper>
-  );
-}
+        {qrModal}
+      </AppWrapper>
+    );
+  }
 
 function CameraCaptureStep({
   videoRef,
@@ -1528,13 +2130,15 @@ export default function SalonExperience() {
     lastDurationMs: null,
     timingBreakdown: null,
   });
-  const [tryOnState, setTryOnState] = useState<{ results: TryOnResult[]; isGenerating: boolean; processingMessage: string; errorMessage: string | null; selectedResultStyleId: string | null; selectedColorId: string; colorPreviews: Record<string, string>; isColorGenerating: boolean; colorErrorMessage: string | null; startedAt: number | null; lastDurationMs: number | null }>({
+  const [analysisCache, setAnalysisCache] = useState<Record<string, { imageUrl: string; timing: GenerationTimingBreakdown | null }>>({});
+  const [tryOnState, setTryOnState] = useState<{ results: TryOnResult[]; isGenerating: boolean; processingMessage: string; errorMessage: string | null; selectedResultStyleId: string | null; selectedColorIds: string[]; activeColorId: string; colorPreviews: Record<string, string>; isColorGenerating: boolean; colorErrorMessage: string | null; startedAt: number | null; lastDurationMs: number | null }>({
     results: [],
     isGenerating: false,
     processingMessage: '',
     errorMessage: null,
     selectedResultStyleId: null,
-    selectedColorId: defaultHairColorId,
+    selectedColorIds: [defaultHairColorId],
+    activeColorId: defaultHairColorId,
     colorPreviews: {},
     isColorGenerating: false,
     colorErrorMessage: null,
@@ -1596,7 +2200,8 @@ export default function SalonExperience() {
       processingMessage: '',
       errorMessage: null,
       selectedResultStyleId: null,
-      selectedColorId: defaultHairColorId,
+      selectedColorIds: [defaultHairColorId],
+      activeColorId: defaultHairColorId,
       colorPreviews: {},
       isColorGenerating: false,
       colorErrorMessage: null,
@@ -1714,8 +2319,22 @@ export default function SalonExperience() {
     setStep('preview');
   };
 
-  const handleAnalysis = async () => {
+  const handleAnalysis = async (options: { force?: boolean } = {}) => {
     if (!selectedImage) {
+      return;
+    }
+
+    // Check cache
+    if (!options.force && analysisCache[selectedImage]) {
+      const cached = analysisCache[selectedImage];
+      setAnalysisState((previous) => ({
+        ...previous,
+        imageUrl: cached.imageUrl,
+        timingBreakdown: cached.timing,
+        isGenerating: false,
+        errorMessage: null,
+      }));
+      setStep('result');
       return;
     }
 
@@ -1762,6 +2381,12 @@ export default function SalonExperience() {
 
       const imageUrl = result.data.images[0]?.url;
       if (imageUrl) {
+        // Save to cache
+        setAnalysisCache(prev => ({
+          ...prev,
+          [selectedImage]: { imageUrl, timing }
+        }));
+        
         setAnalysisState((previous) => ({ ...previous, imageUrl, timingBreakdown: timing }));
         setStep('result');
       } else {
@@ -1781,6 +2406,10 @@ export default function SalonExperience() {
         startedAt: null,
       }));
     }
+  };
+
+  const handleRegenAnalysis = () => {
+    handleAnalysis({ force: true });
   };
 
   const toggleStyle = (styleId: string) => {
@@ -1830,7 +2459,7 @@ export default function SalonExperience() {
           image_urls: [selectedImage],
           prompt: buildTryOnPrompt(style),
           quality: 'medium',
-          image_size: 'square_hd',
+          image_size: 'portrait_4_3',
           output_format: 'png',
           num_images: 1,
         });
@@ -1896,12 +2525,37 @@ export default function SalonExperience() {
     }));
   };
 
-  const handleSelectHairColor = (colorId: string) => {
-    setTryOnState((previous) => ({
-      ...previous,
-      selectedColorId: colorId,
-      colorErrorMessage: null,
-    }));
+  const handleSelectHairColor = (colorId: string, options: { toggle?: boolean } = { toggle: true }) => {
+    setTryOnState((previous) => {
+      const isSelected = previous.selectedColorIds.includes(colorId);
+      let nextSelected: string[];
+      let nextActive = previous.activeColorId;
+
+      if (isSelected) {
+        if (options.toggle) {
+          nextSelected = previous.selectedColorIds.filter((id) => id !== colorId);
+          // If we deselected the currently active color, switch to the last selected color
+          if (nextActive === colorId) {
+            nextActive = nextSelected.length > 0 ? nextSelected[nextSelected.length - 1] : '';
+          }
+        } else {
+          // Just make it active if it's already selected
+          nextSelected = previous.selectedColorIds;
+          nextActive = colorId;
+        }
+      } else {
+        nextSelected = [...previous.selectedColorIds, colorId];
+        // Selecting a new color always makes it active
+        nextActive = colorId;
+      }
+
+      return {
+        ...previous,
+        selectedColorIds: nextSelected,
+        activeColorId: nextActive,
+        colorErrorMessage: null,
+      };
+    });
   };
 
   const handleClearColorCache = () => {
@@ -1910,22 +2564,10 @@ export default function SalonExperience() {
 
   const handleGenerateHairColor = async () => {
     const selectedResult = tryOnState.results.find((result) => result.styleId === tryOnState.selectedResultStyleId) ?? tryOnState.results[0];
-    const selectedColor = hairColorOptions.find((color) => color.id === tryOnState.selectedColorId);
+    const colorsToGenerate = hairColorOptions.filter((color) => tryOnState.selectedColorIds.includes(color.id));
 
-    if (!selectedResult || !selectedColor) {
-      setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'กรุณาเลือกทรงผมและสีผมก่อนสร้างพรีวิว' }));
-      return;
-    }
-
-    const cacheKey = `${selectedResult.styleId}_${selectedColor.id}`;
-
-    // ── Return cached result without calling AI ──
-    if (tryOnState.colorPreviews[cacheKey]) {
-      setTryOnState((previous) => ({
-        ...previous,
-        selectedResultStyleId: selectedResult.styleId,
-        colorErrorMessage: null,
-      }));
+    if (!selectedResult || colorsToGenerate.length === 0) {
+      setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'กรุณาเลือกทรงผมและสีผมอย่างน้อย 1 สี' }));
       return;
     }
 
@@ -1937,27 +2579,54 @@ export default function SalonExperience() {
     }));
 
     try {
-      const result = await subscribeTryOnEdit({
-        image_urls: [selectedResult.imageUrl],
-        prompt: buildHairColorPrompt(selectedResult.styleLabel, selectedColor),
-        quality: 'medium',
-        image_size: 'square_hd',
-        output_format: 'png',
-        num_images: 1,
+      // Create a list of all generation tasks: (Style + Color) and (Original + Color)
+      const tasks: { styleId: string; styleLabel: string; imageUrl: string; color: HairColorOption }[] = [];
+      
+      colorsToGenerate.forEach(color => {
+        // Task for the current selected style
+        tasks.push({ 
+          styleId: selectedResult.styleId, 
+          styleLabel: selectedResult.styleLabel, 
+          imageUrl: selectedResult.imageUrl, 
+          color 
+        });
+        
+        // If we are in styles mode, also add task for Original Hair recoloring
+        if (mode === 'styles') {
+          tasks.push({ 
+            styleId: 'original', 
+            styleLabel: 'ทรงผมเดิม', 
+            imageUrl: selectedImage!, 
+            color 
+          });
+        }
       });
 
-      const imageUrl = result.result.data.images[0]?.url;
-      if (imageUrl) {
-        setTryOnState((previous) => ({
-          ...previous,
-          colorPreviews: { ...previous.colorPreviews, [cacheKey]: imageUrl },
-        }));
-      } else {
-        setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'สร้างพรีวิวสีผมไม่สำเร็จ ลองเลือกสีใหม่อีกครั้ง' }));
-      }
+      // Generate with concurrency
+      await mapWithConcurrency(tasks, 2, async (task) => {
+        const cacheKey = `${task.styleId}_${task.color.id}`;
+        if (tryOnState.colorPreviews[cacheKey]) return;
+
+        const result = await subscribeTryOnEdit({
+          image_urls: [task.imageUrl],
+          prompt: buildHairColorPrompt(task.styleLabel, task.color),
+          quality: 'medium',
+          image_size: 'portrait_4_3',
+          output_format: 'png',
+          num_images: 1,
+        });
+
+        const imageUrl = result.result.data.images[0]?.url;
+        if (imageUrl) {
+          setTryOnState((previous) => ({
+            ...previous,
+            colorPreviews: { ...previous.colorPreviews, [cacheKey]: imageUrl },
+          }));
+        }
+      });
     } catch (error) {
-      console.error('Try-on hair color error:', error);
-      setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'สร้างพรีวิวสีผมไม่สำเร็จ ลองใหม่อีกครั้ง' }));
+      console.error('Try-on multi-hair color error:', error);
+      setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'สร้างพรีวิวบางสีไม่สำเร็จ ลองใหม่อีกครั้ง' }));
     } finally {
       setTryOnState((previous) => ({ ...previous, isColorGenerating: false }));
     }
@@ -2010,6 +2679,14 @@ export default function SalonExperience() {
         onPrimary={() => {
           if (mode === 'analysis') {
             handleAnalysis();
+          } else if (mode === 'recolor') {
+            setTryOnState((previous) => ({
+              ...previous,
+              results: [{ styleId: 'original', styleLabel: 'ทรงผมเดิม', imageUrl: selectedImage! }],
+              selectedResultStyleId: 'original',
+              errorMessage: null,
+            }));
+            setStep('result');
           } else {
             setTryOnState((previous) => ({ ...previous, errorMessage: null }));
             setStep('styles');
@@ -2041,9 +2718,10 @@ export default function SalonExperience() {
 
   if (step === 'result' && selectedImage) {
     const activeStyleId = tryOnState.selectedResultStyleId ?? tryOnState.results[0]?.styleId ?? '';
-    const activeCacheKey = `${activeStyleId}_${tryOnState.selectedColorId}`;
+    const activeCacheKey = `${activeStyleId}_${tryOnState.activeColorId}`;
     const derivedColorPreviewUrl = tryOnState.colorPreviews[activeCacheKey] ?? '';
     const colorCacheCount = Object.keys(tryOnState.colorPreviews).length;
+
     return (
       <ResultStep
         mode={mode}
@@ -2053,7 +2731,8 @@ export default function SalonExperience() {
         errorMessage={activeErrorMessage}
         selectedTryOnStyleId={tryOnState.selectedResultStyleId}
         onSelectTryOnStyle={handleSelectTryOnStyle}
-        selectedHairColorId={tryOnState.selectedColorId}
+        selectedHairColorIds={tryOnState.selectedColorIds}
+        activeColorId={tryOnState.activeColorId}
         onSelectHairColor={handleSelectHairColor}
         onGenerateHairColor={handleGenerateHairColor}
         hairColorPreviewUrl={derivedColorPreviewUrl}
@@ -2065,6 +2744,8 @@ export default function SalonExperience() {
         onClearColorCache={handleClearColorCache}
         onRestart={() => resetFlow(null)}
         onBackToUpload={() => resetFlow(mode)}
+        onRegenAnalysis={handleRegenAnalysis}
+        colorPreviews={tryOnState.colorPreviews}
       />
     );
   }

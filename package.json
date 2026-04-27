@@ -16,8 +16,10 @@
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@mui/material-nextjs": "^9.0.0",
+    "@next/swc-win32-x64-msvc": "^16.2.4",
     "iconsax-react": "^0.0.8",
     "next": "16.2.4",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "swiper": "^12.1.3"

@@ -127,7 +127,8 @@ const subscribeEdit = async (kind: 'analysis' | 'try-on', input: EditImageInput,
 
     return { result, timing };
   } catch (error) {
-    console.error(`[fal][${kind}] openai/gpt-image-2/edit error`, {
+    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack } : error;
+    console.error(`[fal][${kind}] ${ENDPOINT} error`, {
       endpoint: ENDPOINT,
       input: summarizeInput(input),
       timing: buildTimingBreakdown({
@@ -138,7 +139,7 @@ const subscribeEdit = async (kind: 'analysis' | 'try-on', input: EditImageInput,
         requestId,
         providerInferenceMs,
       }),
-      error,
+      error: errorDetails,
     });
     throw error;
   }

@@ -2,7 +2,7 @@ import type { HairColorOption, HairstyleOption } from '@/components/salon-experi
 
 export const analysisPrompt = [
   'Create a hair analysis infographic from this portrait.',
-  'Return one vertical 3:4 composite infographic on a clean light-gray background with dark uppercase panel headers.',
+  'Return one vertical 2:3 composite infographic on a clean light-gray background with dark uppercase panel headers.',
   'English only. Use very short labels only: 1-3 words, no paragraphs, no Thai, no decorative fonts.',
   'Photoreal only. Keep the same identity, facial geometry, skin texture, pose, framing, camera angle, and perspective across all panels.',
   'Only the top-left main portrait may be the exact unedited source photo.',
@@ -39,11 +39,14 @@ export function buildTryOnPrompt(style: HairstyleOption) {
 }
 
 export function buildHairColorPrompt(styleLabel: string, color: HairColorOption) {
+  const isOriginal = styleLabel === 'ทรงผมเดิม';
+  const targetDesc = isOriginal ? "the person's existing hair" : `the ${styleLabel} hairstyle`;
+  
   return [
-    `Edit this hairstyle result for hair coloring preview. Selected hairstyle: ${styleLabel}.`,
-    `Selected hair color: ${color.label}.`,
+    `Edit this image for hair coloring preview on ${targetDesc}.`,
+    `Target hair color: ${color.label}.`,
     color.prompt,
-    'Change only the hair color.',
+    'Change only the hair color. Do not change the haircut, shape, or length.',
     'Preserve the exact same face identity, facial features, skin tone, head shape, hairstyle shape, hair length, hairline, fringe, parting, and hair texture.',
     'Keep pose, camera angle, lighting, background, and clothing unchanged.',
     'Do not retouch facial structure and do not alter makeup intensity.',
