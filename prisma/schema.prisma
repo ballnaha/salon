@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// Log every AI generation call for cost tracking
+model AiGenerationLog {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+
+  /// Type of generation: 'analysis' | 'try-on' | 'hair-color'
+  generationType String   @db.VarChar(32)
+
+  /// For try-on: styleId, styleLabel. For hair-color: colorId, colorLabel
+  styleId        String?  @db.VarChar(64)
+  styleLabel     String?  @db.VarChar(128)
+  colorId        String?  @db.VarChar(64)
+  colorLabel     String?  @db.VarChar(128)
+
+  /// Fal AI model identifier used
+  modelId        String?  @db.VarChar(128)
+
+  /// Output image URL returned by Fal AI
+  outputImageUrl String?  @db.Text
+
+  /// Total round-trip duration in milliseconds
+  durationMs     Int?
+
+  /// Fal AI queue time (ms)
+  queueMs        Int?
+
+  /// Fal AI inference time (ms)
+  inferenceMs    Int?
+
+  /// Whether generation succeeded
+  success        Boolean  @default(true)
+
+  /// Error message if generation failed
+  errorMessage   String?  @db.Text
+
+  /// Link to the customer session
+  sessionId      String?  @db.VarChar(36)
+  session        CustomerSession? @relation(fields: [sessionId], references: [id])
+
+  /// Link to the salon owner (User) who generated this
+  userId         String?  @db.VarChar(191)
+  user           User?    @relation(fields: [userId], references: [id])
+
+  /// Local path where the image is downloaded and saved
+  localImagePath String?  @db.Text
+
+  @@index([createdAt])
+  @@index([generationType])
+  @@index([sessionId])
+  @@index([userId])
+  @@map("ai_generation_logs")
+}
+
+/// Represents a single customer's kiosk session
+model CustomerSession {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  createdAt         DateTime @default(now())
+  
+  /// Link to the salon owner (User)
+  userId            String?  @db.VarChar(191)
+  user              User?    @relation(fields: [userId], references: [id])
+
+  /// Path to the original uploaded/captured image
+  originalImagePath String?  @db.Text
+  
+  logs              AiGenerationLog[]
+
+  @@map("customer_sessions")
+}
+
+/// SaaS User (Salon Owner)
+model User {
+  id            String    @id @default(cuid()) @db.VarChar(191)
+  name          String?   @db.VarChar(191)
+  email         String?   @unique @db.VarChar(191)
+  password      String?   @db.VarChar(191) // For credentials login
+  
+  // Salon Info
+  salonName     String?   @db.VarChar(191) // Name of their salon
+  ownerName     String?   @db.VarChar(191) // Owner's full name
+  phone         String?   @db.VarChar(50)  // Contact number
+  
+  /// Remaining image generation credits
+  credits       Int       @default(100) 
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  customerSessions CustomerSession[]
+  generationLogs   AiGenerationLog[]
+
+  @@map("users")
+}

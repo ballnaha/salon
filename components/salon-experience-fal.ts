@@ -3,6 +3,13 @@ import type { EditImageInput, EditImageResult, EditSubscribeOptions, EditSubscri
 
 const ENDPOINT = 'openai/gpt-image-2/edit';
 
+// ── DEV MOCK MODE (flag) ────────────────────────────────────────────────────────
+// Set NEXT_PUBLIC_FAL_MOCK=true in .env.local to skip all Fal AI API calls.
+// A placeholder image will be returned instead — zero credits consumed.
+const IS_FAL_MOCK = process.env.NEXT_PUBLIC_FAL_MOCK === 'true';
+// ───────────────────────────────────────────────────────────────────────────────
+
+
 type FalQueueStatus = {
   status: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED';
   request_id: string;
@@ -50,7 +57,41 @@ const buildTimingBreakdown = ({
   providerInferenceMs,
 });
 
+// ── DEV MOCK MODE (implementation) ──────────────────────────────────────────────
+// Placeholder image used in mock mode (512×683 dark grey via placehold.co)
+const MOCK_IMAGE_URL = 'https://placehold.co/512x683/1a1a2e/d993a4?text=FAL+MOCK+MODE';
+
+const mockSubscribeEdit = async (
+  kind: 'analysis' | 'try-on',
+  input: EditImageInput,
+  options: EditSubscribeOptions = {},
+): Promise<EditSubscribeResult> => {
+  console.warn(`[fal][${kind}] ⚠️  MOCK MODE — skipping real API call (NEXT_PUBLIC_FAL_MOCK=true)`, summarizeInput(input));
+
+  // Simulate submission → queued → generating → completed
+  options.onStatusChange?.({ phase: 'submitting', requestId: null, queuePosition: null });
+  await new Promise((r) => setTimeout(r, 1000));
+  options.onStatusChange?.({ phase: 'queued', requestId: 'mock-request-id', queuePosition: 1 });
+  await new Promise((r) => setTimeout(r, 2000));
+  options.onStatusChange?.({ phase: 'generating', requestId: 'mock-request-id', queuePosition: null });
+  await new Promise((r) => setTimeout(r, 7000));
+  options.onStatusChange?.({ phase: 'completed', requestId: 'mock-request-id', queuePosition: null });
+
+  const mockResult: EditImageResult = { data: { images: [{ url: MOCK_IMAGE_URL }] } };
+  const timing: GenerationTimingBreakdown = {
+    requestId: 'mock-request-id',
+    submitMs: 1000,
+    queueMs: 2000,
+    generationMs: 7000,
+    totalMs: 10000,
+    providerInferenceMs: null,
+  };
+  return { result: mockResult, timing };
+};
+// ───────────────────────────────────────────────────────────────────────────────
+
 const subscribeEdit = async (kind: 'analysis' | 'try-on', input: EditImageInput, options: EditSubscribeOptions = {}): Promise<EditSubscribeResult> => {
+  if (IS_FAL_MOCK) return mockSubscribeEdit(kind, input, options);
   const subscribe = falClient.subscribe as unknown as (
     endpointId: string,
     options: {
