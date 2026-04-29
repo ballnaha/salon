@@ -16,8 +16,10 @@ export async function GET() {
         'Authorization': `Key ${falKey}`,
         'Content-Type': 'application/json'
       },
-      // ไม่ต้อง cache เพื่อให้ได้ค่ายอดเงินล่าสุดเสมอ
-      cache: 'no-store'
+      // Cache for 5 minutes (300 seconds) to avoid rate limits
+      next: {
+        revalidate: 300
+      }
     });
 
     if (response.status === 403 || response.status === 401) {
@@ -26,6 +28,10 @@ export async function GET() {
         error: 'Admin API key required', 
         needsAdmin: true 
       }, { status: 403 });
+    }
+
+    if (response.status === 429) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     if (!response.ok) {

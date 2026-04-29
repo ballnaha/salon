@@ -15,8 +15,8 @@ const prompt = Prompt({
 });
 
 export const metadata: Metadata = {
-  title: "Salon App",
-  description: "Modern Salon Management System",
+  title: "Wegowelup | เวโกเวลอป",
+  description: "Wegowelup (เวโกเวลอป) - Modern Beauty & Salon Management Platform",
 };
 
 export default function RootLayout({

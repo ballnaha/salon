@@ -166,87 +166,159 @@ export const hairstyleOptions: HairstyleOption[] = [
   },
 ];
 
+export const hairColorCategoryInfo: Record<string, { title: string, description: string, image: string }> = {
+  'Classic Foundations': {
+    title: 'Classic Foundations (สีพื้นมาตรฐาน)',
+    description: 'การทำสีผมโทนธรรมชาติแบบสีเดียวทั่วศีรษะ เน้นความเงางามและสุขภาพดี เหมาะสำหรับการปกปิดผมขาวหรือต้องการลุคที่ดูเรียบหรูและเป็นทางการ',
+    image: '/examples/classic_foundations_example_1777429234055.png'
+  },
+  'Luxe Ash & Matte': {
+    title: 'Luxe Ash & Matte (โทนหม่นพรีเมียม)',
+    description: 'เทคนิคการผสมสีโทนหม่นเทาหรือหม่นเขียว เพื่อช่วยหักล้างเม็ดสีส้ม/แดงในเส้นผม ให้ลุคที่ดูทันสมัย นุ่มนวล สไตล์เกาหลีและญี่ปุ่น',
+    image: '/examples/luxe_ash_example_1777429250686.png'
+  },
+  'Dimensional Highlights': {
+    title: 'Dimensional Highlights (ไฮไลท์เพิ่มมิติ)',
+    description: 'การทำสีบางส่วนให้สว่างกว่าสีพื้น เพื่อสร้างมิติและการตกกระทบของแสง ทำให้เส้นผมดูมีวอลลุ่ม พริ้วไหว และเห็นลอนผมชัดเจนขึ้น',
+    image: '/examples/highlights_example_1777429267474.png'
+  },
+  'Artistic Balayage': {
+    title: 'Artistic Balayage (เทคนิคไล่เฉดศิลปะ)',
+    description: 'การไล่เฉดสีจากโคนเข้มไปปลายสว่างแบบไร้รอยต่อ ให้ลุคที่ดูเป็นธรรมชาติและพรีเมียมที่สุด โดยไม่ต้องกังวลเรื่องโคนผมดำที่งอกใหม่',
+    image: '/examples/balayage_example_1777429282879.png'
+  },
+  'Specialty Design': {
+    title: 'Specialty Design (เทคนิคดีไซน์เฉพาะจุด)',
+    description: 'การออกแบบตำแหน่งสีเฉพาะจุด เช่น Money Piece (กรอบหน้าสว่าง) หรือ Inner Color (สีซ่อนด้านใน) เพื่อแสดงเอกลักษณ์และความคิดสร้างสรรค์',
+    image: '/examples/specialty_design_example_1777429299035.png'
+  }
+};
+
 export const hairColorOptions: HairColorOption[] = [
-  // ── Natural & Dark ─────────────────────────────────────────────────────────
+  // ── 1. Classic Foundations (สีพื้นมาตรฐาน) ────────────────────────────────
   {
-    id: 'natural-black',
-    label: 'Natural Black',
-    category: 'Natural & Dark',
+    id: 'deep-espresso',
+    label: 'Deep Espresso',
+    category: 'Classic Foundations',
     swatch: '#1a1414',
-    prompt: 'Recolor the hair to natural black with soft realistic shine.',
+    prompt: 'Recolor the hair to a deep, uniform espresso black with a high-gloss salon finish. The hair should look exceptionally healthy, dense, and naturally reflective.',
+    descriptionThai: 'สีดำเข้มเอสเพรสโซ่ ให้ลุคที่ดูผมสุขภาพดี หนา และมีความเงางามสูง',
+    exampleImage: '/examples/classic_foundations_example_1777429234055.png'
   },
   {
-    id: 'dark-brown',
-    label: 'Chocolate Brown',
-    category: 'Natural & Dark',
+    id: 'warm-mocha',
+    label: 'Warm Mocha Brown',
+    category: 'Classic Foundations',
     swatch: '#4a3528',
-    prompt: 'Recolor the hair to dark chocolate brown with natural depth.',
+    prompt: 'Apply a rich, warm mocha brown color. Ensure even coverage from roots to ends with subtle chocolate undertones and a silky, luminous texture.',
+    descriptionThai: 'สีน้ำตาลมอคค่าโทนอุ่น ให้ความรู้สึกนุ่มนวล เป็นธรรมชาติ และขับผิวให้ดูสว่าง',
+    exampleImage: '/examples/classic_foundations_example_1777429234055.png'
   },
   {
-    id: 'deep-plum',
-    label: 'Deep Plum Brown',
-    category: 'Natural & Dark',
-    swatch: '#3b2f3e',
-    prompt: 'Recolor the hair to deep plum brown with subtle violet undertones.',
-  },
-
-  // ── Fashion & Ash ──────────────────────────────────────────────────────────
-  {
-    id: 'ash-brown',
-    label: 'Ash Brown',
-    category: 'Fashion & Ash',
-    swatch: '#6a5a4f',
-    prompt: 'Recolor the hair to ash brown with cool muted tone.',
-  },
-  {
-    id: 'smoky-gray',
-    label: 'Smoky Ash Gray',
-    category: 'Fashion & Ash',
-    swatch: '#7a7c82',
-    prompt: 'Recolor the hair to smoky gray with balanced cool undertone.',
-  },
-  {
-    id: 'lavender-ash',
-    label: 'Lavender Ash',
-    category: 'Fashion & Ash',
-    swatch: '#8a859e',
-    prompt: 'Recolor the hair to lavender ash with soft purple-gray reflect.',
-  },
-  {
-    id: 'platinum-blonde',
-    label: 'Platinum Blonde',
-    category: 'Fashion & Ash',
-    swatch: '#d8d2c1',
-    prompt: 'Recolor the hair to platinum blonde with clean cool reflect.',
+    id: 'honey-walnut',
+    label: 'Honey Walnut',
+    category: 'Classic Foundations',
+    swatch: '#7d5c41',
+    prompt: 'Recolor the hair to a sophisticated honey walnut brown. A perfect balance of warm and neutral tones with a soft, sun-kissed glow.',
+    descriptionThai: 'สีน้ำตาลวอลนัทประกายน้ำผึ้ง มีความสมดุลระหว่างโทนอุ่นและโทนกลาง ดูทันสมัย',
+    exampleImage: '/examples/classic_foundations_example_1777429234055.png'
   },
 
-  // ── Warm & Beige ───────────────────────────────────────────────────────────
+  // ── 2. Luxe Ash & Matte (โทนหม่นพรีเมียม) ──────────────────────────────────
   {
-    id: 'milk-tea-brown',
+    id: 'mushroom-ash',
+    label: 'Mushroom Ash',
+    category: 'Luxe Ash & Matte',
+    swatch: '#8a837b',
+    prompt: 'Apply a professional mushroom ash brown. It should be a cool, muted earthy tone with strong ash reflects and zero brassiness. The finish should be modern and matte.',
+    descriptionThai: 'สีน้ำตาลหม่นเทาแบบเห็ด (Mushroom) ยอดนิยม ช่วยลดไรส้มได้ดีเยี่ยม ให้ลุคแมตต์ที่ดูแพง',
+    exampleImage: '/examples/luxe_ash_example_1777429250686.png'
+  },
+  {
+    id: 'milk-tea-beige',
     label: 'Milk Tea Beige',
-    category: 'Warm & Beige',
-    swatch: '#9a7b5f',
-    prompt: 'Recolor the hair to milk tea brown with soft warm-beige reflect.',
+    category: 'Luxe Ash & Matte',
+    swatch: '#c4aead',
+    prompt: 'Apply the iconic Korean milk tea beige color. A soft, creamy neutral-cool tone that creates an airy, lightweight feel. The hair should look luminous.',
+    descriptionThai: 'สีชานมเบจสไตล์เกาหลี ให้ความรู้สึกละมุน อ่อนหวาน และทำให้ผมดูเบาสบาย',
+    exampleImage: '/examples/luxe_ash_example_1777429250686.png'
   },
   {
-    id: 'caramel-brown',
-    label: 'Caramel Brown',
-    category: 'Warm & Beige',
-    swatch: '#a86f3b',
-    prompt: 'Recolor the hair to caramel brown with warm glossy highlights.',
+    id: 'mint-ash-green',
+    label: 'Mint Ash Green',
+    category: 'Luxe Ash & Matte',
+    swatch: '#6b705c',
+    prompt: 'Recolor the hair to a sophisticated mint ash brown with subtle olive/green undertones to neutralize redness. A very trendy, cool-toned professional look.',
+    descriptionThai: 'สีน้ำตาลหม่นเขียวมินต์ ช่วยฆ่าเม็ดสีแดงในเส้นผมได้ดีที่สุด ให้ลุคที่ดูเย็นและชิค',
+    exampleImage: '/examples/luxe_ash_example_1777429250686.png'
+  },
+
+  // ── 3. Dimensional Highlights (ไฮไลท์เพิ่มมิติ) ─────────────────────────────
+  {
+    id: 'platinum-baby-lights',
+    label: 'Platinum Baby Lights',
+    category: 'Dimensional Highlights',
+    swatch: 'repeating-linear-gradient(90deg, #1a1414, #1a1414 6px, #e5e5e5 6px, #e5e5e5 9px)',
+    prompt: 'Infuse the hair with ultra-fine platinum baby lights over a dark base. These should be extremely thin, delicate highlights that add incredible texture and shimmer.',
+    descriptionThai: 'ไฮไลท์เส้นเล็กละเอียดสีพลาตินัม ช่วยเพิ่มมิติให้ผมดูพริ้วไหวเหมือนโดนแสงแดดตลอดเวลา',
+    exampleImage: '/examples/highlights_example_1777429267474.png'
   },
   {
-    id: 'rose-gold-beige',
-    label: 'Rose Gold Beige',
-    category: 'Warm & Beige',
-    swatch: '#c2928b',
-    prompt: 'Recolor the hair to rose gold beige with warm pinkish reflect.',
+    id: 'caramel-lowlights',
+    label: 'Caramel Lowlights',
+    category: 'Dimensional Highlights',
+    swatch: 'repeating-linear-gradient(90deg, #a86f3b, #a86f3b 8px, #3d2b1f 8px, #3d2b1f 16px)',
+    prompt: 'Add caramel lowlights to create depth and volume. Mix warm caramel strands with deeper chocolate tones for a multi-tonal, thick-looking hair effect.',
+    descriptionThai: 'การทำสีโทนเข้มสลับสีคาราเมล เพื่อสร้างเงาให้ผมดูหนาขึ้นและมีวอลลุ่มอย่างเป็นธรรมชาติ',
+    exampleImage: '/examples/highlights_example_1777429267474.png'
+  },
+
+  // ── 4. Artistic Balayage & Ombre (เทคนิคไล่เฉดศิลปะ) ───────────────────────
+  {
+    id: 'sand-blonde-balayage',
+    label: 'Sand Blonde Balayage',
+    category: 'Artistic Balayage',
+    swatch: 'linear-gradient(180deg, #3d2b1f 0%, #d2b48c 100%)',
+    prompt: 'Apply a designer sand blonde balayage. Keep roots deep natural brown and seamlessly hand-paint light sand-blonde tones from mid-lengths to ends with a soft gradient.',
+    descriptionThai: 'การไล่สีสไตล์บาลาญิาจโทนบลอนด์ทราย ให้โคนเข้มปลายสว่างแบบไร้รอยต่อ ดูหรูหรา',
+    exampleImage: '/examples/balayage_example_1777429282879.png'
   },
   {
-    id: 'copper-brown',
-    label: 'Copper Brown',
-    category: 'Warm & Beige',
-    swatch: '#8b4a3a',
-    prompt: 'Recolor the hair to copper brown with vibrant warm reflect.',
+    id: 'ash-grey-ombre',
+    label: 'Ash Grey Ombre',
+    category: 'Artistic Balayage',
+    swatch: 'linear-gradient(180deg, #1a1414 0%, #8a8d91 100%)',
+    prompt: 'Apply a dramatic ash-grey ombre effect. Transition from a dark charcoal root to a light, cool smoky grey at the ends with a clean, professional blend.',
+    descriptionThai: 'การไล่สีจากโคนดำไปปลายเทาหม่นแบบ Ombre ให้ลุคที่ดูโฉบเฉี่ยวและมีสไตล์ชัดเจน',
+    exampleImage: '/examples/balayage_example_1777429282879.png'
+  },
+
+  // ── 5. Specialty Design (เทคนิคดีไซน์เฉพาะจุด) ──────────────────────────────
+  {
+    id: 'money-piece-highlights',
+    label: 'Money Piece (Face Frame)',
+    category: 'Specialty Design',
+    swatch: 'linear-gradient(90deg, #f5f5dc 20%, #1a1414 20%, #1a1414 80%, #f5f5dc 80%)',
+    prompt: 'Apply the "Money Piece" technique. Keep overall hair natural, but add two bold, bright blonde sections strictly framing the face for a high-impact brightening effect.',
+    descriptionThai: 'การทำไฮไลท์กรอบหน้า (Money Piece) ช่วยขับใบหน้าให้ดูสว่างและโดดเด่นทันที',
+    exampleImage: '/examples/specialty_design_example_1777429299035.png'
+  },
+  {
+    id: 'secret-ash-pink',
+    label: 'Secret Inner Color',
+    category: 'Specialty Design',
+    swatch: 'linear-gradient(135deg, #1a1414 60%, #d993a4 60%)',
+    prompt: 'Apply a "Secret Color" effect. Outer layer remains natural espresso, while the inner layers at the nape and ears are colored muted ash-pink. Visible when hair moves.',
+    descriptionThai: 'สีซ่อนด้านใน (Secret Color) โทนชมพูหม่น สวยแบบหลบซ่อน จะเห็นชัดเมื่อสะบัดผมหรือมัดผม',
+    exampleImage: '/examples/specialty_design_example_1777429299035.png'
+  },
+  {
+    id: 'shadow-root-blonde',
+    label: 'Shadow Root Blonde',
+    category: 'Specialty Design',
+    swatch: 'radial-gradient(circle, #f0e68c 0%, #3d2b1f 100%)',
+    prompt: 'Apply a shadow root technique. The roots are kept dark (espresso) and blend quickly into a bright creamy blonde. This creates a lived-in, voluminous look.',
+    descriptionThai: 'การทำโคนผมให้ดูมีเงาเข้ม (Shadow Root) ช่วยให้ผมดูมีวอลลุ่มและไม่ต้องเติมโคนบ่อย',
+    exampleImage: '/examples/specialty_design_example_1777429299035.png'
   },
 ];

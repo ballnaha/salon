@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
 
     // Create a new session record in DB to get a UUID
     const session = await prisma.customerSession.create({
-      data: { salonId: branchId }
+      data: { 
+        userId: branchId === 'default_salon' ? null : branchId 
+      }
     });
 
     const sessionId = session.id;

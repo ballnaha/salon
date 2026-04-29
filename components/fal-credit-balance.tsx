@@ -16,6 +16,10 @@ export function FalCreditBalance() {
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {
+          if (res.status === 429) {
+            console.warn("Fal API rate limit exceeded");
+            return;
+          }
           if (data?.needsAdmin) {
             setNeedsAdmin(true);
           } else {

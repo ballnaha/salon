@@ -38,6 +38,8 @@ export const authOptions: AuthOptions = {
           name: user.name,
           email: user.email,
           salonName: user.salonName,
+          role: user.role,
+          branchId: user.branchId,
         };
       }
     })
@@ -47,6 +49,8 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.id = user.id;
         token.salonName = (user as any).salonName;
+        token.role = (user as any).role;
+        token.branchId = (user as any).branchId;
       }
       return token;
     },
@@ -54,6 +58,8 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).salonName = token.salonName;
+        (session.user as any).role = token.role;
+        (session.user as any).branchId = token.branchId;
       }
       return session;
     }

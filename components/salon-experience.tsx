@@ -13,7 +13,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, Fade } from '@mui/material';
 import { subscribeAnalysisEdit, subscribeTryOnEdit } from '@/components/salon-experience-fal';
 import { analysisPrompt, buildHairColorPrompt, buildTryOnPrompt } from '@/components/salon-experience-prompts';
-import { hairColorOptions, hairstyleOptions } from '@/components/salon-experience-styles';
+import { hairColorOptions, hairstyleOptions, hairColorCategoryInfo } from '@/components/salon-experience-styles';
 import type { FlowMode, FlowStep, GenerationTimingBreakdown, HairColorOption, HairstyleOption, TryOnResult } from '@/components/salon-experience-types';
 import { FalCreditBalance } from '@/components/fal-credit-balance';
 import { logAiGeneration } from '@/lib/log-ai-generation';
@@ -175,13 +175,13 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
     <AppWrapper>
       {/* ── MOBILE LAYOUT ── */}
       <Box sx={{ display: { xs: 'flex', sm: 'none' }, height: '100vh', width: '100%', flexDirection: 'column', position: 'relative' }}>
-        
+
         {/* Top bar for Mobile */}
         <Box sx={{ position: 'absolute', top: 16, right: 16, left: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
-          <Chip label={salonName || "Salon AI"} sx={{ bgcolor: 'rgba(255,255,255,0.9)', fontWeight: 'bold', color: '#0f172a' }} />
-          <Button 
-            variant="contained" 
-            size="small" 
+          <Chip label={salonName || "Wegowelup"} sx={{ bgcolor: 'rgba(255,255,255,0.9)', fontWeight: 'bold', color: '#0f172a' }} />
+          <Button
+            variant="contained"
+            size="small"
             disabled={isLoggingOut}
             sx={{ borderRadius: 8, bgcolor: 'rgba(0,0,0,0.5)', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
             onClick={handleLogout}
@@ -252,7 +252,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
               }}
             >
               <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(217,147,164,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8b0c0' }}>
-                <Magicpen size={18} variant="Bold" color="currentColor" />
+                <Magicpen size={18} variant="Bold" color="#d993a4" />
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Analysis</Typography>
@@ -281,7 +281,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
               }}
             >
               <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1a1114' }}>
-                <Camera size={18} variant="Bold" color="currentColor" />
+                <Camera size={18} variant="Bold" color="#1a1114" />
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: '#1a1114', fontWeight: 800, fontSize: '0.72rem' }}>Try-On</Typography>
@@ -310,7 +310,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
               }}
             >
               <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(226,177,138,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e2b18a' }}>
-                <Brush size={18} variant="Bold" color="currentColor" />
+                <Brush size={18} variant="Bold" color="#e2b18a" />
               </Box>
               <Stack spacing={0} sx={{ alignItems: 'center' }}>
                 <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>Color</Typography>
@@ -328,12 +328,12 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
 
       {/* ── DESKTOP LAYOUT ── */}
       <Box sx={{ display: { xs: 'none', sm: 'flex' }, width: '100%', height: '100%', position: 'relative' }}>
-        
+
         {/* Top bar for Desktop */}
         <Box sx={{ position: 'absolute', top: 24, right: 32, left: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
-          <Chip label={salonName || "Salon AI"} sx={{ bgcolor: 'rgba(255,255,255,0.9)', fontWeight: 'bold', color: '#0f172a', fontSize: '1rem', py: 2 }} />
-          <Button 
-            variant="contained" 
+          <Chip label={salonName || "Wegowelup"} sx={{ bgcolor: 'rgba(255,255,255,0.9)', fontWeight: 'bold', color: '#0f172a', fontSize: '1rem', py: 2 }} />
+          <Button
+            variant="contained"
             disabled={isLoggingOut}
             sx={{ borderRadius: 8, bgcolor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }, color: '#0f172a' }}
             onClick={handleLogout}
@@ -384,7 +384,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
                   <Chip label="Smart Analysis" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(74,21,37,0.08)', color: '#9f445e', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, background: 'linear-gradient(160deg, #4a1525 0%, #2d0d17 100%)', color: '#e8b0c0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Magicpen size={28} variant="Bold" color="currentColor" />
+                  <Magicpen size={28} variant="Outline" color="#d993a4" />
                 </Box>
               </Stack>
             </Button>
@@ -402,7 +402,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
                   <Chip label="Virtual Try-On" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(15,23,42,0.08)', color: '#0f172a', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, bgcolor: '#d993a4', color: '#1a1114', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Camera size={28} variant="Bold" color="currentColor" />
+                  <Camera size={28} variant="Bold" color="#1a1114" />
                 </Box>
               </Stack>
             </Button>
@@ -420,7 +420,7 @@ function ModeSelectionStep({ onSelect, salonName }: { onSelect: (mode: FlowMode)
                   <Chip label="AI Color" sx={{ height: 28, fontSize: '0.72rem', bgcolor: 'rgba(124,61,40,0.1)', color: '#7c3d28', fontWeight: 900, borderRadius: 1.5 }} />
                 </Stack>
                 <Box sx={{ width: 88, background: 'linear-gradient(160deg, #7c3d28 0%, #4d2418 100%)', color: '#e2b18a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Brush size={28} variant="Bold" color="currentColor" />
+                  <Brush size={28} variant="Bold" color="#e2b18a" />
                 </Box>
               </Stack>
             </Button>
@@ -1404,7 +1404,7 @@ function ResultStep({
   onSelectTryOnStyle: (styleId: string) => void;
   selectedHairColorIds: string[];
   activeColorId: string;
-  onSelectHairColor: (colorId: string, options?: { toggle?: boolean }) => void;
+  onSelectHairColor: (colorId: string, options?: { toggle?: boolean; forceSelect?: boolean }) => void;
   onGenerateHairColor: () => void;
   hairColorPreviewUrl: string;
   isGeneratingHairColor: boolean;
@@ -1421,6 +1421,7 @@ function ResultStep({
   const hasTryOnResults = tryOnResults.length > 0;
   const selectedTryOnResult = tryOnResults.find((result) => result.styleId === selectedTryOnStyleId) ?? tryOnResults[0] ?? null;
   const activeColor = hairColorOptions.find((color) => color.id === activeColorId) ?? null;
+  const isActiveColorSelected = activeColor && selectedHairColorIds.includes(activeColor.id);
   const selectedColorCount = selectedHairColorIds?.length ?? 0;
   const isCurrentActiveCached = !!hairColorPreviewUrl;
   const generationTimeLabel = generationDurationMs ? formatElapsedMs(generationDurationMs) : null;
@@ -1433,6 +1434,8 @@ function ResultStep({
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [selectedCategoryInfo, setSelectedCategoryInfo] = useState<typeof hairColorCategoryInfo[string] | null>(null);
+  const [previewColor, setPreviewColor] = useState<HairColorOption | null>(null);
 
   const activeImageUrl = mode === 'analysis' ? analysisImageUrl : (hairColorPreviewUrl || selectedTryOnResult?.imageUrl || '');
 
@@ -1452,20 +1455,146 @@ function ResultStep({
       }
 
       const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const prefix = mode === 'analysis' ? 'salon-ai-analysis' : `salon-ai-${activeColor?.label || 'style'}`;
-      const filename = `${prefix}-${timestamp}.png`;
 
-      anchor.href = objectUrl;
-      anchor.download = filename;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 100);
+      // Load image to canvas to add overlay
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      const blobUrl = URL.createObjectURL(blob);
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = blobUrl;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error("Canvas context not available");
+
+      // Draw the main image
+      ctx.drawImage(img, 0, 0);
+
+      // Add overlay for try-on or recolor
+      if (mode === 'try-on' || mode === 'recolor') {
+        const isTryOn = mode === 'try-on';
+        const styleLabel = selectedTryOnResult?.styleLabel;
+        const colorLabel = activeColor?.label;
+        const colorSwatch = activeColor?.swatch;
+
+        // Overlay styling
+        const padding = Math.max(20, canvas.width * 0.04);
+        const fontSize = Math.max(20, Math.floor(canvas.width * 0.035));
+        const smallFontSize = Math.max(16, Math.floor(fontSize * 0.75));
+        const cornerRadius = 12;
+
+        // Font selection (trying to use Inter if loaded, otherwise sans-serif)
+        const mainFont = `bold ${fontSize}px "Inter", "Sarabun", "Arial", sans-serif`;
+        const subFont = `500 ${smallFontSize}px "Inter", "Sarabun", "Arial", sans-serif`;
+
+        ctx.font = mainFont;
+
+        const hasStyle = isTryOn && styleLabel && styleLabel !== 'ทรงผมเดิม';
+        const hasColor = !!colorLabel;
+
+        if (hasStyle || hasColor) {
+          // Measure text to size the box
+          let boxWidth = 0;
+          let boxHeight = 0;
+
+          const sLabel = hasStyle ? styleLabel : '';
+          const cLabel = hasColor ? colorLabel : '';
+
+          const styleMetrics = hasStyle ? ctx.measureText(sLabel) : { width: 0 };
+          ctx.font = subFont;
+          const colorMetrics = hasColor ? ctx.measureText(cLabel) : { width: 0 };
+
+          const swatchSize = hasColor ? smallFontSize : 0;
+          const swatchGap = hasColor ? 8 : 0;
+
+          boxWidth = Math.max(styleMetrics.width, colorMetrics.width + swatchSize + swatchGap) + padding * 1.5;
+
+          if (hasStyle && hasColor) {
+            boxHeight = fontSize + smallFontSize + padding * 1.2;
+          } else if (hasStyle || hasColor) {
+            boxHeight = Math.max(fontSize, smallFontSize) + padding * 1.2;
+          }
+
+          // Position at bottom-left
+          const margin = padding;
+          const bx = margin;
+          const by = canvas.height - margin - boxHeight;
+
+          // Draw rounded background
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+          // Fallback for roundRect
+          if (typeof (ctx as any).roundRect === 'function') {
+            (ctx as any).roundRect(bx, by, boxWidth, boxHeight, cornerRadius);
+            ctx.fill();
+          } else {
+            ctx.fillRect(bx, by, boxWidth, boxHeight);
+          }
+
+          let currentY = by + padding * 0.6;
+
+          // Draw Style
+          if (hasStyle) {
+            ctx.font = mainFont;
+            ctx.fillStyle = 'white';
+            ctx.textBaseline = 'top';
+            ctx.fillText(sLabel, bx + padding * 0.75, currentY);
+            currentY += fontSize + 4;
+          }
+
+          // Draw Color
+          if (hasColor) {
+            ctx.font = subFont;
+            ctx.textBaseline = 'top';
+            const cx = bx + padding * 0.75;
+
+            if (colorSwatch) {
+              ctx.fillStyle = colorSwatch;
+              ctx.beginPath();
+              ctx.arc(cx + swatchSize / 2, currentY + smallFontSize / 2, swatchSize / 2, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+              ctx.lineWidth = 1.5;
+              ctx.stroke();
+            }
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText(cLabel, cx + (colorSwatch ? swatchSize + swatchGap : 0), currentY);
+          }
+        }
+      }
+
+      // Convert back to blob and download
+      canvas.toBlob((resultBlob) => {
+        if (!resultBlob) {
+          fallbackOpen();
+          return;
+        }
+        const finalUrl = URL.createObjectURL(resultBlob);
+        const anchor = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const prefix = mode === 'analysis' ? 'salon-ai-analysis' : `salon-ai-${activeColor?.label || 'style'}`;
+        const filename = `${prefix}-${timestamp}.png`;
+
+        anchor.href = finalUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+
+        setTimeout(() => {
+          URL.revokeObjectURL(finalUrl);
+          URL.revokeObjectURL(blobUrl);
+        }, 100);
+      }, 'image/png');
+
     } catch (error) {
-      console.error('Download failed:', error);
+      console.error('Download with overlay failed:', error);
       fallbackOpen();
     } finally {
       setIsDownloading(false);
@@ -1660,7 +1789,7 @@ function ResultStep({
                   fontSize: { xs: '0.8rem', sm: '0.85rem' },
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.3)' }
                 }}
-                startIcon={<Refresh2 size={16} color="currentColor" />}
+                startIcon={<Refresh2 size={18} color="#fbcfe8" />}
               >
                 วิเคราะห์ใหม่
               </Button>
@@ -1686,7 +1815,7 @@ function ResultStep({
               </Button>
               <Button
                 variant="outlined"
-                startIcon={<Refresh variant="Bold" />}
+                startIcon={<Refresh variant="Bold" color="#d993a4" />}
                 onClick={onBackToUpload}
                 size="small"
                 sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.28)', borderRadius: { xs: 3, sm: 2.5 }, px: { xs: 1, sm: 2.25 }, py: { xs: 1, sm: 0.75 }, minHeight: { xs: 44, sm: 34 }, minWidth: 0, flex: { xs: 1, md: '0 0 auto' }, textTransform: 'none', fontSize: { xs: '0.8rem', sm: '0.875rem' }, lineHeight: 1.15, touchAction: 'manipulation', '& .MuiButton-startIcon': { mr: { xs: 0.6, sm: 1 }, ml: 0 } }}
@@ -1694,7 +1823,7 @@ function ResultStep({
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>ใช้รูปใหม่</Box>
                 <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>รูปใหม่</Box>
               </Button>
-              <Button variant="contained" startIcon={<TickCircle variant="Bold" />} onClick={onRestart} size="small" sx={{ bgcolor: '#d993a4', color: '#1a1114', borderRadius: { xs: 3, sm: 2.5 }, px: { xs: 1, sm: 2.25 }, py: { xs: 1, sm: 0.75 }, minHeight: { xs: 44, sm: 34 }, minWidth: 0, flex: { xs: 1, md: '0 0 auto' }, fontWeight: 700, textTransform: 'none', fontSize: { xs: '0.8rem', sm: '0.875rem' }, lineHeight: 1.15, touchAction: 'manipulation', '& .MuiButton-startIcon': { mr: { xs: 0.6, sm: 1 }, ml: 0 } }}>
+              <Button variant="contained" startIcon={<TickCircle variant="Bold" color="#1a1114" />} onClick={onRestart} size="small" sx={{ bgcolor: '#d993a4', color: '#1a1114', borderRadius: { xs: 3, sm: 2.5 }, px: { xs: 1, sm: 2.25 }, py: { xs: 1, sm: 0.75 }, minHeight: { xs: 44, sm: 34 }, minWidth: 0, flex: { xs: 1, md: '0 0 auto' }, fontWeight: 700, textTransform: 'none', fontSize: { xs: '0.8rem', sm: '0.875rem' }, lineHeight: 1.15, touchAction: 'manipulation', '& .MuiButton-startIcon': { mr: { xs: 0.6, sm: 1 }, ml: 0 } }}>
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>กลับหน้าแรก</Box>
                 <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>หน้าแรก</Box>
               </Button>
@@ -1952,9 +2081,9 @@ function ResultStep({
                     <SwiperSlide style={{ width: 'auto' }}>
                       <Box component="button" onClick={() => onSelectHairColor('', { toggle: false })}
                         sx={{ p: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0, width: { xs: 76, md: 86 }, textAlign: 'center' }}>
-                        <Box sx={{ 
-                          borderRadius: 2, 
-                          overflow: 'hidden', 
+                        <Box sx={{
+                          borderRadius: 2,
+                          overflow: 'hidden',
                           border: activeColorId === '' ? '2.5px solid #d993a4' : '2.5px solid transparent',
                           aspectRatio: '2/3',
                           bgcolor: '#0d0810'
@@ -1973,18 +2102,18 @@ function ResultStep({
                       const cacheKey = `${selectedTryOnStyleId ?? 'original'}_${colorId}`;
                       const previewUrl = colorPreviews[cacheKey];
                       if (!previewUrl) return null;
-                      
+
                       const active = activeColorId === colorId;
                       return (
                         <SwiperSlide key={colorId} style={{ width: 'auto' }}>
                           <Box component="button" onClick={() => onSelectHairColor(colorId, { toggle: false })}
                             sx={{ p: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0, width: { xs: 76, md: 86 }, textAlign: 'center' }}>
-                            <Box sx={{ 
-                              borderRadius: 2, 
-                              overflow: 'hidden', 
+                            <Box sx={{
+                              borderRadius: 2,
+                              overflow: 'hidden',
                               border: active ? '2.5px solid #d993a4' : '2.5px solid transparent',
                               aspectRatio: '2/3',
-                              bgcolor: color?.swatch 
+                              bgcolor: color?.swatch
                             }}>
                               <Box component="img" src={previewUrl} alt={color?.label} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </Box>
@@ -2024,76 +2153,112 @@ function ResultStep({
 
               {/* Categorized Swatches */}
               <Stack spacing={2.5} sx={{ mb: 3 }}>
-                {['Natural & Dark', 'Fashion & Ash', 'Warm & Beige'].map(cat => (
+                {['Classic Foundations', 'Luxe Ash & Matte', 'Dimensional Highlights', 'Artistic Balayage', 'Specialty Design'].map(cat => (
                   <Box key={cat}>
-                    <Typography sx={{ color: '#d993a4', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 1.25, opacity: 0.8 }}>
-                      {cat}
-                    </Typography>
-                    <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+                    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.25 }}>
+                      <Typography sx={{ color: '#d993a4', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.8 }}>
+                        {cat}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => setSelectedCategoryInfo(hairColorCategoryInfo[cat])}
+                        sx={{ p: 0, color: '#d993a4', opacity: 0.6, '&:hover': { opacity: 1 } }}
+                      >
+                        <SearchNormal1 size={13} variant="Bold" color="#d993a4" />
+                      </IconButton>
+                    </Stack>
+                    <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.25 }}>
                       {hairColorOptions.filter(c => c.category === cat).map((color) => {
                         const isSelected = selectedHairColorIds.includes(color.id);
                         const isActive = color.id === activeColorId;
                         return (
-                          <Box key={color.id} component="button" onClick={() => onSelectHairColor(color.id)}
+                          <Box key={color.id}
                             sx={{
+                              position: 'relative',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 1.1,
-                              pl: 0.8, pr: 1.2, // Use fixed padding to prevent layout shifts
-                              py: 0.8,
                               borderRadius: 99,
-                              border: isActive ? `2.5px solid ${accentRose}` : isSelected ? `1.5px solid rgba(217,147,164,0.5)` : '1.5px solid rgba(255,255,255,0.06)',
-                              background: (isActive || isSelected) ? '#fff' : 'rgba(255,255,255,0.02)',
-                              color: (isActive || isSelected) ? '#1a1114' : 'rgba(255,255,255,0.5)',
-                              cursor: 'pointer',
-                              minHeight: 40,
                               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                              transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                              boxShadow: isActive ? `0 8px 24px rgba(217,147,164,0.35)` : isSelected ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                              transform: isActive ? 'scale(1.05)' : 'scale(1)',
                               zIndex: isActive ? 2 : 1,
-                              '&:hover': {
-                                background: (isActive || isSelected) ? '#fff' : 'rgba(255,255,255,0.08)',
-                                borderColor: isActive ? accentRose : isSelected ? accentRose : 'rgba(255,255,255,0.18)',
-                                transform: isActive ? 'scale(1.08)' : 'scale(1.03)',
-                              }
-                            }}>
-                            <Box sx={{
-                              width: 24, height: 24, borderRadius: '50%',
-                              bgcolor: color.swatch,
-                              border: '2px solid rgba(255,255,255,0.3)',
-                              flexShrink: 0,
-                              position: 'relative',
-                              overflow: 'hidden',
-                              '&::after': {
-                                content: '""',
-                                position: 'absolute',
-                                top: -2, left: -2, right: -2, bottom: -2,
-                                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 60%)',
-                                borderRadius: '50%'
-                              }
-                            }} />
-                            
-                            {/* Text container: Reserving space for bold text to prevent layout shift */}
-                            <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-                              <Typography sx={{ fontSize: '0.78rem', fontWeight: 900, lineHeight: 1, letterSpacing: '0.01em', visibility: 'hidden' }}>
+                            }}
+                          >
+                            <Box component="button"
+                              onClick={() => onSelectHairColor(color.id, { forceSelect: true })}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.2,
+                                pl: 0.8, pr: 1.5,
+                                py: 0.8,
+                                borderRadius: 99,
+                                border: isActive ? `2.5px solid ${accentRose}` : isSelected ? `1.5px solid rgba(217,147,164,0.4)` : '1.5px solid rgba(255,255,255,0.06)',
+                                background: (isActive || isSelected) ? 'white' : 'rgba(255,255,255,0.02)',
+                                color: (isActive || isSelected) ? '#1a1114' : 'rgba(255,255,255,0.5)',
+                                cursor: 'pointer',
+                                minHeight: 44,
+                                transition: 'all 0.25s ease',
+                                boxShadow: isActive ? `0 8px 24px rgba(217,147,164,0.3)` : 'none',
+                                '&:hover': {
+                                  background: (isActive || isSelected) ? 'white' : 'rgba(255,255,255,0.08)',
+                                  borderColor: accentRose,
+                                }
+                              }}>
+                              <Box sx={{
+                                width: 26, height: 26, borderRadius: '50%',
+                                bgcolor: color.swatch,
+                                border: '2px solid rgba(255,255,255,0.3)',
+                                flexShrink: 0,
+                                position: 'relative'
+                              }} />
+
+                              <Typography sx={{ fontSize: '0.8rem', fontWeight: isSelected || isActive ? 900 : 500, letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
                                 {color.label}
                               </Typography>
-                              <Typography sx={{ position: 'absolute', left: 0, fontSize: '0.78rem', fontWeight: isSelected || isActive ? 900 : 500, lineHeight: 1, letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
-                                {color.label}
-                              </Typography>
+
+                              <Box
+                                component="span"
+                                title="ยกเลิกการเลือก"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSelectHairColor(color.id, { toggle: true });
+                                }}
+                                sx={{
+                                  ml: 0.5,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  p: 0.2,
+                                  borderRadius: '50%',
+                                  bgcolor: 'transparent',
+                                  '&:hover': { color: '#e11d48' },
+                                  transition: 'all 0.2s'
+                                }}
+                              >
+                                {isSelected ? <CloseCircle size={18} variant="Bold" color={isActive ? accentRose : '#d993a4'} /> : null}
+                              </Box>
                             </Box>
 
-                            {/* Icon container: Always takes up 16px to prevent layout shift */}
-                            <Box sx={{ 
-                              width: 16, height: 16, 
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              opacity: isSelected ? 1 : 0,
-                              transform: isSelected ? 'scale(1)' : 'scale(0.5)',
-                              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                              ml: -0.2
-                            }}>
-                              <TickCircle size={16} variant="Bold" color={isActive ? accentRose : '#f9a8d4'} />
-                            </Box>
+                            {/* Quick Preview Icon */}
+                            <IconButton
+                              size="small"
+                              onClick={() => setPreviewColor(color)}
+                              sx={{
+                                position: 'absolute',
+                                top: -6,
+                                right: -6,
+                                bgcolor: '#1a1114',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                color: 'white',
+                                p: 0.5,
+                                opacity: isActive ? 1 : 0,
+                                transform: isActive ? 'scale(1)' : 'scale(0.5)',
+                                transition: 'all 0.2s ease',
+                                '&:hover': { bgcolor: accentRose, color: '#1a1114' }
+                              }}
+                            >
+                              <SearchNormal1 size={11} variant="Bold" color="white" />
+                            </IconButton>
                           </Box>
                         );
                       })}
@@ -2101,6 +2266,82 @@ function ResultStep({
                   </Box>
                 ))}
               </Stack>
+
+              {/* Color Selection Preview */}
+              {activeColor && (
+                <Fade in={!!activeColor}>
+                  <Box sx={{
+                    mt: 1, p: 2,
+                    borderRadius: '20px',
+                    background: 'linear-gradient(135deg, rgba(217, 147, 164, 0.1) 0%, rgba(217, 147, 164, 0.04) 100%)',
+                    border: '1px solid rgba(217, 147, 164, 0.2)',
+                    display: 'flex',
+                    gap: 2.5,
+                    alignItems: 'center',
+                    mb: 3,
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <Box sx={{ position: 'absolute', top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right, ${activeColor.swatch}20 0%, transparent 70%)`, pointerEvents: 'none' }} />
+
+                    {activeColor.exampleImage && (
+                      <Box
+                        onClick={() => setPreviewColor(activeColor)}
+                        sx={{
+                          position: 'relative',
+                          cursor: 'pointer',
+                          '&:hover .zoom-overlay': { opacity: 1 },
+                          flexShrink: 0
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={activeColor.exampleImage}
+                          sx={{ width: 72, height: 72, borderRadius: '14px', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 20px rgba(0,0,0,0.3)' }}
+                        />
+                        <Box
+                          className="zoom-overlay"
+                          sx={{
+                            position: 'absolute', inset: 0, bgcolor: 'rgba(0,0,0,0.5)', borderRadius: '14px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s',
+                            backdropFilter: 'blur(2px)'
+                          }}
+                        >
+                          <SearchNormal1 size={20} color="white" variant="Bold" />
+                        </Box>
+                      </Box>
+                    )}
+                    <Box sx={{ flex: 1 }}>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5, justifyContent: 'space-between' }}>
+                        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: activeColor.swatch, border: '1px solid rgba(255,255,255,0.2)' }} />
+                          <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.9rem' }}>
+                            {activeColor.label}
+                          </Typography>
+                        </Stack>
+                        <IconButton
+                          size="small"
+                          onClick={() => onSelectHairColor(activeColor.id, { toggle: true })}
+                          sx={{ color: 'rgba(255,255,255,0.3)', p: 0.5, '&:hover': { color: '#fda4af', bgcolor: 'rgba(253,164,175,0.1)' } }}
+                          title="ลบสีนี้ออก"
+                        >
+                          <CloseCircle size={18} color="#fda4af" />
+                        </IconButton>
+                      </Stack>
+                      <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem', lineHeight: 1.5, mb: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {activeColor.descriptionThai || 'สร้างมิติใหม่ให้กับเส้นผมของคุณด้วยเทคนิคระดับมืออาชีพ'}
+                      </Typography>
+                      <Button
+                        size="small"
+                        onClick={() => setPreviewColor(activeColor)}
+                        sx={{ color: '#d993a4', textTransform: 'none', fontSize: '0.65rem', fontWeight: 800, p: 0, minHeight: 0, '&:hover': { color: 'white' } }}
+                      >
+                        ดูรายละเอียดสีเพิ่มเติม
+                      </Button>
+                    </Box>
+                  </Box>
+                </Fade>
+              )}
 
               <Button fullWidth variant="contained"
                 onClick={onGenerateHairColor}
@@ -2123,8 +2364,8 @@ function ResultStep({
                     transform: isCurrentActiveCached ? 'none' : 'translateY(-2px)'
                   },
                   transition: 'all 0.3s ease',
-                  '&.Mui-disabled': { 
-                    background: 'rgba(255,255,255,0.05)', 
+                  '&.Mui-disabled': {
+                    background: 'rgba(255,255,255,0.05)',
                     color: 'rgba(255,255,255,0.25)',
                     boxShadow: 'none',
                     border: '1px dashed rgba(255,255,255,0.15)'
@@ -2142,6 +2383,123 @@ function ResultStep({
         </Box>
       </Box>
       {qrModal}
+
+      {/* Unified Detail Modal (Category & Color Preview) */}
+      <Dialog 
+        open={!!selectedCategoryInfo || !!previewColor} 
+        onClose={() => { setSelectedCategoryInfo(null); setPreviewColor(null); }}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(20, 15, 20, 0.95)',
+              backdropFilter: 'blur(25px)',
+              borderRadius: '32px',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              overflow: 'hidden',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.7)'
+            }
+          }
+        }}
+      >
+        <Box sx={{ 
+          position: 'relative', 
+          maxHeight: '90vh', 
+          overflowY: 'auto',
+          /* Custom Premium Scrollbar */
+          '&::-webkit-scrollbar': { width: '6px' },
+          '&::-webkit-scrollbar-track': { background: 'transparent' },
+          '&::-webkit-scrollbar-thumb': { 
+            background: 'rgba(217, 147, 164, 0.2)', 
+            borderRadius: '10px',
+            '&:hover': { background: 'rgba(217, 147, 164, 0.4)' }
+          }
+        }}>
+          {/* Image Section Container */}
+          <Box sx={{ position: 'relative', height: 500, bgcolor: '#000', overflow: 'hidden' }}>
+            {/* Blurred Background to fill gaps */}
+            <Box
+              component="img"
+              src={selectedCategoryInfo?.image || previewColor?.exampleImage}
+              sx={{ 
+                position: 'absolute', 
+                inset: 0, 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover', 
+                filter: 'blur(20px) brightness(0.4)',
+                transform: 'scale(1.1)' 
+              }}
+            />
+            
+            {/* Main Image (Contained - see all hair) */}
+            <Box
+              component="img"
+              src={selectedCategoryInfo?.image || previewColor?.exampleImage}
+              sx={{ 
+                position: 'relative', 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain',
+                zIndex: 1
+              }}
+            />
+          </Box>
+          
+          {/* Top Gradient Overlay */}
+          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 5 }} />
+
+          {/* Close Button - Moved to high z-index */}
+          <IconButton 
+            onClick={() => { setSelectedCategoryInfo(null); setPreviewColor(null); }}
+            sx={{ 
+              position: 'absolute', 
+              top: 16, 
+              right: 16, 
+              bgcolor: 'rgba(0,0,0,0.5)', 
+              color: 'white', 
+              zIndex: 10,
+              '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }, 
+              backdropFilter: 'blur(8px)' 
+            }}
+          >
+            <CloseCircle size={24} color="white" />
+          </IconButton>
+
+          {/* Content Section */}
+          <Box sx={{ p: { xs: 3, sm: 4 }, mt: -4, position: 'relative', bgcolor: 'rgba(20, 15, 20, 0.95)', backdropFilter: 'blur(30px)', borderTopLeftRadius: '32px', borderTopRightRadius: '32px', border: '1px solid rgba(255,255,255,0.08)', borderBottom: 'none' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
+              <Stack spacing={0.5}>
+                <Typography sx={{ color: '#d993a4', fontSize: '0.65rem', fontWeight: 900, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  {previewColor ? 'Hair Color Detail' : 'Collection Category'}
+                </Typography>
+                <Typography variant="h4" sx={{ color: 'white', fontWeight: 900, letterSpacing: '-0.02em', fontSize: { xs: '1.5rem', sm: '1.85rem' } }}>
+                  {previewColor ? previewColor.label : selectedCategoryInfo?.title}
+                </Typography>
+              </Stack>
+              
+              <Box sx={{ bgcolor: 'rgba(217,147,164,0.1)', border: '1px solid rgba(217,147,164,0.3)', color: '#d993a4', px: 1.5, py: 0.6, borderRadius: 2, fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.08em', backdropFilter: 'blur(10px)' }}>
+                PREMIUM
+              </Box>
+            </Box>
+
+            {previewColor && (
+              <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
+                <Box sx={{ width: 42, height: 42, borderRadius: 2.5, bgcolor: previewColor.swatch, border: '2px solid rgba(255,255,255,0.15)', boxShadow: `0 8px 20px ${previewColor.swatch}40` }} />
+                <Box>
+                  <Typography sx={{ color: 'white', fontSize: '0.85rem', fontWeight: 700 }}>{previewColor.category}</Typography>
+                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>Professional Grade Color</Typography>
+                </Box>
+              </Stack>
+            )}
+
+            <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', lineHeight: 1.8, mb: 2, letterSpacing: '0.01em', fontWeight: 300 }}>
+              {previewColor ? previewColor.descriptionThai : selectedCategoryInfo?.description}
+            </Typography>
+          </Box>
+        </Box>
+      </Dialog>
     </AppWrapper>
   );
 }
@@ -2368,22 +2726,25 @@ export default function SalonExperience() {
   const activeSalonId = (session?.user as any)?.id || process.env.NEXT_PUBLIC_SALON_ID;
 
   const initSession = async (base64Image: string) => {
+    if (sessionId) return sessionId;
     try {
       const res = await fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           originalImageBase64: base64Image,
-          salonId: activeSalonId 
+          salonId: activeSalonId
         }),
       });
       const data = await res.json();
       if (data.ok && data.sessionId) {
         setSessionId(data.sessionId);
+        return data.sessionId;
       }
     } catch (err) {
       console.error('Failed to init session', err);
     }
+    return null;
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -2402,11 +2763,9 @@ export default function SalonExperience() {
       try {
         const optimizedImage = await optimizeImageDataUrl(result);
         setSelectedImage(optimizedImage);
-        initSession(optimizedImage);
       } catch (error) {
         console.error('Image optimization error:', error);
         setSelectedImage(result);
-        initSession(result);
       }
 
       resetAnalysisState();
@@ -2460,11 +2819,9 @@ export default function SalonExperience() {
     try {
       const optimizedImage = await optimizeImageDataUrl(dataUrl);
       setSelectedImage(optimizedImage);
-      initSession(optimizedImage);
     } catch (error) {
       console.error('Captured image optimization error:', error);
       setSelectedImage(dataUrl);
-      initSession(dataUrl);
     }
 
     resetAnalysisState();
@@ -2504,6 +2861,12 @@ export default function SalonExperience() {
       timingBreakdown: null,
     }));
     setStep('processing');
+
+    // Ensure session exists before AI call
+    let currentSessionId = sessionId;
+    if (!currentSessionId && selectedImage) {
+      currentSessionId = await initSession(selectedImage);
+    }
 
     try {
       const { result, timing } = await subscribeAnalysisEdit(
@@ -2547,7 +2910,7 @@ export default function SalonExperience() {
 
         // Log for cost tracking
         logAiGeneration({
-          sessionId: sessionId ?? undefined,
+          sessionId: currentSessionId ?? undefined,
           salonId: activeSalonId,
           generationType: 'analysis',
           modelId: 'openai/gpt-image-2/edit',
@@ -2560,12 +2923,13 @@ export default function SalonExperience() {
       } else {
         setAnalysisState((previous) => ({ ...previous, errorMessage: 'วิเคราะห์รูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง', timingBreakdown: timing }));
         setStep('preview');
-        logAiGeneration({ sessionId: sessionId ?? undefined, salonId: activeSalonId, generationType: 'analysis', modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
+        logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'analysis', modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
       }
     } catch (error) {
       console.error('Analysis error:', error);
       setAnalysisState((previous) => ({ ...previous, errorMessage: 'วิเคราะห์รูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง' }));
       setStep('preview');
+      logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'analysis', modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: error instanceof Error ? error.message : 'Unknown error' });
     } finally {
       setAnalysisState((previous) => ({
         ...previous,
@@ -2615,6 +2979,12 @@ export default function SalonExperience() {
     }));
     setStep('processing');
 
+    // Ensure session exists before AI call
+    let currentSessionId = sessionId;
+    if (!currentSessionId && selectedImage) {
+      currentSessionId = await initSession(selectedImage);
+    }
+
     const selectedStyles = hairstyleOptions.filter((style) => selectedStyleIds.includes(style.id));
     let completedCount = 0;
     setTryOnState((previous) => ({
@@ -2637,7 +3007,7 @@ export default function SalonExperience() {
         if (imageUrl) {
           // Log for cost tracking
           logAiGeneration({
-            sessionId: sessionId ?? undefined,
+            sessionId: currentSessionId ?? undefined,
             salonId: activeSalonId,
             generationType: 'try-on',
             styleId: style.id,
@@ -2658,11 +3028,11 @@ export default function SalonExperience() {
             },
           };
         }
-        logAiGeneration({ sessionId: sessionId ?? undefined, salonId: activeSalonId, generationType: 'try-on', styleId: style.id, styleLabel: style.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
+        logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'try-on', styleId: style.id, styleLabel: style.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
         return { ok: false as const };
       } catch (error) {
         console.error(`Try-on error for ${style.id}:`, error);
-        logAiGeneration({ sessionId: sessionId ?? undefined, salonId: activeSalonId, generationType: 'try-on', styleId: style.id, styleLabel: style.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: String(error) });
+        logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'try-on', styleId: style.id, styleLabel: style.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: String(error) });
         return { ok: false as const };
       } finally {
         completedCount += 1;
@@ -2765,6 +3135,11 @@ export default function SalonExperience() {
     }));
 
     try {
+      // Ensure session exists before AI call
+      let currentSessionId = sessionId;
+      if (!currentSessionId && selectedImage) {
+        currentSessionId = await initSession(selectedImage);
+      }
       // Create a list of all generation tasks: (Style + Color) and (Original + Color)
       const tasks: { styleId: string; styleLabel: string; imageUrl: string; color: HairColorOption }[] = [];
 
@@ -2777,8 +3152,8 @@ export default function SalonExperience() {
           color
         });
 
-        // If we are in styles mode, also add task for Original Hair recoloring
-        if (mode === 'styles') {
+        // If we are in try-on mode, also add task for Original Hair recoloring
+        if (mode === 'try-on') {
           tasks.push({
             styleId: 'original',
             styleLabel: 'ทรงผมเดิม',
@@ -2810,7 +3185,7 @@ export default function SalonExperience() {
           }));
           // Log for cost tracking
           logAiGeneration({
-            sessionId: sessionId ?? undefined,
+            sessionId: currentSessionId ?? undefined,
             salonId: activeSalonId,
             generationType: 'hair-color',
             styleId: task.styleId,
@@ -2825,12 +3200,14 @@ export default function SalonExperience() {
             success: true,
           });
         } else {
-          logAiGeneration({ sessionId: sessionId ?? undefined, salonId: activeSalonId, generationType: 'hair-color', styleId: task.styleId, styleLabel: task.styleLabel, colorId: task.color.id, colorLabel: task.color.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
+          logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'hair-color', styleId: task.styleId, styleLabel: task.styleLabel, colorId: task.color.id, colorLabel: task.color.label, modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: 'No image in response' });
         }
       });
     } catch (error) {
       console.error('Try-on multi-hair color error:', error);
       setTryOnState((previous) => ({ ...previous, colorErrorMessage: 'สร้างพรีวิวบางสีไม่สำเร็จ ลองใหม่อีกครั้ง' }));
+      let currentSessionId = sessionId;
+      logAiGeneration({ sessionId: currentSessionId ?? undefined, salonId: activeSalonId, generationType: 'hair-color', modelId: 'openai/gpt-image-2/edit', success: false, errorMessage: error instanceof Error ? error.message : 'Unknown error' });
     } finally {
       setTryOnState((previous) => ({ ...previous, isColorGenerating: false }));
     }

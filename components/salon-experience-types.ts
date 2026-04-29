@@ -22,8 +22,11 @@ export type TryOnResult = {
 export type HairColorOption = {
   id: string;
   label: string;
+  category: string;
   swatch: string;
   prompt: string;
+  descriptionThai?: string;
+  exampleImage?: string;
 };
 
 export type EditImageInput = {
